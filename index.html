@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EzSkills - 个人技能库</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
+        html, body { height: 100%; }
+        body { display: flex; flex-direction: column; }
+        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
+        .card-hover { transition: all 0.3s; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15); }
+        .tag-active { background: #8b5cf6; color: white; }
+        .category-active { background: #8b5cf6; color: white; }
+        .progress-bar { transition: width 0.3s ease; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        main { flex: 1; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-violet-50 to-purple-50 min-h-screen">
+    <!-- Header -->
+    <header class="glass sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center text-white text-2xl">📚</div>
+                    <h1 class="text-xl font-bold text-slate-800">EzSkills</h1>
+                </div>
+                <div class="flex-1 max-w-xl">
+                    <input type="text" id="searchInput" placeholder="搜索技能、标签、来源..."
+                        class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-violet-500">
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="showAddModal()" class="p-2 bg-violet-600 text-white rounded-xl hover:bg-violet-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+        <!-- Stats -->
+        <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="bg-white rounded-xl p-4 border border-slate-200">
+                <div class="text-2xl font-bold text-violet-600"><span id="totalSkills">0</span></div>
+                <div class="text-xs text-slate-500">总技能</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-slate-200">
+                <div class="text-2xl font-bold text-blue-600"><span id="learningSkills">0</span></div>
+                <div class="text-xs text-slate-500">学习中</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-slate-200">
+                <div class="text-2xl font-bold text-green-600"><span id="masteredSkills">0</span></div>
+                <div class="text-xs text-slate-500">已掌握</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-slate-200">
+                <div class="text-2xl font-bold text-orange-600"><span id="totalUses">0</span></div>
+                <div class="text-xs text-slate-500">总使用</div>
+            </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="flex flex-wrap gap-2 mb-4">
+            <button onclick="filterCategory('all')" class="category-btn category-active px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="all">全部</button>
+            <button onclick="filterCategory('ai-coding')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="ai-coding">🤖 AI编程</button>
+            <button onclick="filterCategory('frontend')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="frontend">⚛️ 前端</button>
+            <button onclick="filterCategory('backend')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="backend">⚙️ 后端</button>
+            <button onclick="filterCategory('tools')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="tools">🛠️ 工具</button>
+            <button onclick="filterCategory('content')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="content">✍️ 内容</button>
+            <button onclick="filterCategory('design')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="design">🎨 设计</button>
+        </div>
+
+        <!-- Tags -->
+        <div id="tagsContainer" class="flex flex-wrap gap-2 mb-6"></div>
+
+        <!-- Skills Grid -->
+        <section>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-slate-800">技能库</h2>
+                <span id="skillsCount" class="text-sm text-slate-500">0 个技能</span>
+            </div>
+            <div id="skillsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12">
+        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center text-white text-lg">📚</div>
+                    <span class="text-slate-600 text-sm">EzSkills - 个人技能库</span>
+                </div>
+                <div class="flex items-center gap-6 text-sm text-slate-500">
+                    <a href="https://keepwonder.top" class="hover:text-violet-600 transition-colors">主页</a>
+                    <a href="https://skills.sh" target="_blank" class="hover:text-violet-600 transition-colors">Skills.sh</a>
+                    <a href="https://clawhub.ai" target="_blank" class="hover:text-violet-600 transition-colors">ClawHub</a>
+                    <span>© 2026</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Add Skill Modal -->
+    <div id="addModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md p-6">
+            <div class="flex justify-between mb-4">
+                <h3 class="text-lg font-bold">添加技能</h3>
+                <button onclick="closeModal('addModal')" class="text-slate-400">✕</button>
+            </div>
+            <form id="addForm" class="space-y-4">
+                <input type="text" name="name" required placeholder="技能名称" class="w-full px-4 py-2 border rounded-xl">
+                <select name="category" class="w-full px-4 py-2 border rounded-xl">
+                    <option value="ai-coding">🤖 AI编程</option>
+                    <option value="frontend">⚛️ 前端</option>
+                    <option value="backend">⚙️ 后端</option>
+                    <option value="tools">🛠️ 工具</option>
+                    <option value="content">✍️ 内容</option>
+                    <option value="design">🎨 设计</option>
+                </select>
+                <input type="text" name="source" placeholder="来源 (如: skills.sh, clawhub)" class="w-full px-4 py-2 border rounded-xl">
+                <input type="url" name="url" placeholder="文档链接" class="w-full px-4 py-2 border rounded-xl">
+                <textarea name="desc" placeholder="描述" rows="3" class="w-full px-4 py-2 border rounded-xl"></textarea>
+                <input type="text" name="tags" placeholder="标签（空格分隔）" class="w-full px-4 py-2 border rounded-xl">
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeModal('addModal')" class="flex-1 py-2 border rounded-xl">取消</button>
+                    <button type="submit" class="flex-1 py-2 bg-violet-600 text-white rounded-xl">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Skill Detail Modal -->
+    <div id="detailModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-lg p-6">
+            <div class="flex justify-between mb-4">
+                <h3 id="detailTitle" class="text-lg font-bold">技能详情</h3>
+                <button onclick="closeModal('detailModal')" class="text-slate-400">✕</button>
+            </div>
+            <div id="detailContent" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <script>
+        // Default Skills Data
+        const defaultSkills = [
+            { id: 1, name: 'find-skills', category: 'tools', source: 'skills.sh', url: 'https://skills.sh', desc: '发现并安装新的 Agent Skills', tags: ['skills', 'discovery'], status: 'mastered', progress: 100, uses: 42, icon: '🔍' },
+            { id: 2, name: 'vercel-react-best-practices', category: 'frontend', source: 'skills.sh', url: 'https://skills.sh', desc: 'Vercel React 开发最佳实践', tags: ['react', 'vercel', 'best-practices'], status: 'learning', progress: 60, uses: 15, icon: '⚛️' },
+            { id: 3, name: 'remotion-best-practices', category: 'content', source: 'skills.sh', url: 'https://skills.sh', desc: 'Remotion 视频制作最佳实践', tags: ['video', 'remotion', 'react'], status: 'learning', progress: 30, uses: 5, icon: '🎬' },
+            { id: 4, name: 'frontend-design', category: 'design', source: 'skills.sh', url: 'https://skills.sh', desc: '前端设计指南', tags: ['design', 'frontend', 'ui'], status: 'mastered', progress: 100, uses: 28, icon: '🎨' },
+            { id: 5, name: 'feishu-doc-writer', category: 'tools', source: 'clawhub', url: 'https://clawhub.ai', desc: '飞书文档写入技能', tags: ['feishu', 'docs', 'api'], status: 'mastered', progress: 100, uses: 56, icon: '📝' },
+            { id: 6, name: 'agent-reach', category: 'tools', source: 'clawhub', url: 'https://clawhub.ai', desc: '网络内容获取技能', tags: ['web', 'scrape', 'api'], status: 'learning', progress: 75, uses: 23, icon: '🌐' },
+            { id: 7, name: 'web-design-guidelines', category: 'design', source: 'skills.sh', url: 'https://skills.sh', desc: '网页设计规范', tags: ['design', 'web', 'css'], status: 'learning', progress: 45, uses: 12, icon: '🖼️' },
+            { id: 8, name: 'claude-code', category: 'ai-coding', source: 'anthropic', url: 'https://claude.ai', desc: 'Claude Code AI 编程助手', tags: ['ai', 'claude', 'coding'], status: 'mastered', progress: 100, uses: 128, icon: '🤖' },
+            { id: 9, name: 'azure-ai', category: 'backend', source: 'skills.sh', url: 'https://skills.sh', desc: 'Azure AI 服务集成', tags: ['azure', 'ai', 'cloud'], status: 'not-started', progress: 0, uses: 0, icon: '☁️' },
+            { id: 10, name: 'cursor-ide', category: 'ai-coding', source: 'cursor.sh', url: 'https://cursor.sh', desc: 'Cursor IDE 使用技巧', tags: ['cursor', 'ide', 'ai'], status: 'learning', progress: 80, uses: 45, icon: '💻' },
+            { id: 11, name: 'docker-basics', category: 'backend', source: 'docker.com', url: 'https://docker.com', desc: 'Docker 容器基础', tags: ['docker', 'container', 'devops'], status: 'mastered', progress: 100, uses: 67, icon: '🐳' },
+            { id: 12, name: 'git-workflow', category: 'tools', source: 'git-scm.com', url: 'https://git-scm.com', desc: 'Git 工作流最佳实践', tags: ['git', 'version-control'], status: 'mastered', progress: 100, uses: 89, icon: '🌿' },
+        ];
+
+        // Data
+        let skills = JSON.parse(localStorage.getItem('ezskills_data')) || [...defaultSkills];
+        let currentCategory = 'all';
+        let currentTag = 'all';
+
+        // Category Names
+        const categoryNames = {
+            'ai-coding': '🤖 AI编程',
+            'frontend': '⚛️ 前端',
+            'backend': '⚙️ 后端',
+            'tools': '🛠️ 工具',
+            'content': '✍️ 内容',
+            'design': '🎨 设计'
+        };
+
+        function save() {
+            localStorage.setItem('ezskills_data', JSON.stringify(skills));
+            updateStats();
+        }
+
+        function updateStats() {
+            document.getElementById('totalSkills').textContent = skills.length;
+            document.getElementById('learningSkills').textContent = skills.filter(s => s.status === 'learning').length;
+            document.getElementById('masteredSkills').textContent = skills.filter(s => s.status === 'mastered').length;
+            document.getElementById('totalUses').textContent = skills.reduce((sum, s) => sum + s.uses, 0);
+        }
+
+        function getAllTags() {
+            const tags = new Set();
+            skills.forEach(s => s.tags.forEach(t => tags.add(t)));
+            return Array.from(tags).sort();
+        }
+
+        function renderTags() {
+            const container = document.getElementById('tagsContainer');
+            const tags = getAllTags();
+            container.innerHTML = tags.map(t => `
+                <button onclick="filterTag('${t}')" class="px-3 py-1 rounded-full text-xs ${currentTag === t ? 'tag-active' : 'bg-white border text-slate-600'}">${t}</button>
+            `).join('') || '<span class="text-sm text-slate-400">暂无标签</span>';
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.toggle('category-active', btn.dataset.category === cat);
+                btn.classList.toggle('bg-white', btn.dataset.category !== cat);
+            });
+            renderSkills();
+        }
+
+        function filterTag(tag) {
+            currentTag = currentTag === tag ? 'all' : tag;
+            renderTags();
+            renderSkills();
+        }
+
+        function getStatusColor(status) {
+            const colors = { 'not-started': 'bg-slate-100 text-slate-500', 'learning': 'bg-blue-100 text-blue-600', 'mastered': 'bg-green-100 text-green-600' };
+            return colors[status] || colors['not-started'];
+        }
+
+        function getStatusText(status) {
+            const texts = { 'not-started': '未开始', 'learning': '学习中', 'mastered': '已掌握' };
+            return texts[status] || '未开始';
+        }
+
+        function renderSkills() {
+            const grid = document.getElementById('skillsGrid');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = skills;
+            if (currentCategory !== 'all') filtered = filtered.filter(s => s.category === currentCategory);
+            if (currentTag !== 'all') filtered = filtered.filter(s => s.tags.includes(currentTag));
+            if (search) filtered = filtered.filter(s => s.name.toLowerCase().includes(search) || s.desc.toLowerCase().includes(search) || s.tags.some(t => t.includes(search)));
+            
+            document.getElementById('skillsCount').textContent = filtered.length + ' 个技能';
+            
+            grid.innerHTML = filtered.map(s => `
+                <div class="card-hover bg-white rounded-2xl p-5 border border-slate-200 cursor-pointer" onclick="showDetail(${s.id})">
+                    <div class="flex items-start gap-3">
+                        <div class="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center text-2xl">${s.icon || '📦'}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-slate-800 truncate">${s.name}</h3>
+                                <span class="text-xs px-2 py-0.5 rounded-full ${getStatusColor(s.status)}">${getStatusText(s.status)}</span>
+                            </div>
+                            <p class="text-sm text-slate-500 mt-1 line-clamp-2">${s.desc}</p>
+                            <div class="flex flex-wrap gap-1 mt-2">${s.tags.map(t => `<span class="text-xs px-2 py-0.5 bg-slate-100 rounded-full">${t}</span>`).join('')}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <div class="flex justify-between text-xs text-slate-400 mb-1">
+                            <span>进度</span>
+                            <span>${s.progress}%</span>
+                        </div>
+                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-violet-500 progress-bar rounded-full" style="width: ${s.progress}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+                        <span class="text-xs text-slate-400">来源: ${s.source}</span>
+                        <span class="text-xs text-slate-500">使用 ${s.uses} 次</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showDetail(id) {
+            const s = skills.find(x => x.id === id);
+            if (!s) return;
+            document.getElementById('detailTitle').textContent = s.name;
+            document.getElementById('detailContent').innerHTML = `
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-16 h-16 bg-violet-100 rounded-xl flex items-center justify-center text-3xl">${s.icon || '📦'}</div>
+                    <div>
+                        <div class="font-bold text-lg">${s.name}</div>
+                        <div class="text-sm text-slate-500">${categoryNames[s.category]}</div>
+                    </div>
+                </div>
+                
+                <p class="text-slate-600">${s.desc}</p>
+                
+                <div class="flex gap-2">${s.tags.map(t => `<span class="px-2 py-1 bg-slate-100 rounded-lg text-sm">${t}</span>`).join('')}</div>
+                
+                <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-violet-500 rounded-full" style="width: ${s.progress}%"></div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="updateStatus(${s.id}, 'not-started')" class="py-2 border rounded-xl ${s.status === 'not-started' ? 'bg-slate-100' : ''}">未开始</button>
+                    <button onclick="updateStatus(${s.id}, 'learning')" class="py-2 border rounded-xl ${s.status === 'learning' ? 'bg-blue-100 text-blue-600' : ''}">学习中</button>
+                    <button onclick="updateStatus(${s.id}, 'mastered')" class="py-2 border rounded-xl ${s.status === 'mastered' ? 'bg-green-100 text-green-600' : ''}">已掌握</button>
+                    <button onclick="incrementUse(${s.id})" class="py-2 bg-violet-600 text-white rounded-xl">+1 使用</button>
+                </div>
+                
+                ${s.url ? `<a href="${s.url}" target="_blank" class="block text-center py-2 bg-violet-50 text-violet-600 rounded-xl">查看文档 →</a>` : ''}
+            `;
+            document.getElementById('detailModal').classList.replace('hidden', 'flex');
+        }
+
+        function updateStatus(id, status) {
+            const s = skills.find(x => x.id === id);
+            if (s) {
+                s.status = status;
+                s.progress = status === 'mastered' ? 100 : status === 'learning' ? 50 : 0;
+                save();
+                renderSkills();
+                showDetail(id);
+            }
+        }
+
+        function incrementUse(id) {
+            const s = skills.find(x => x.id === id);
+            if (s) {
+                s.uses++;
+                save();
+                renderSkills();
+                showDetail(id);
+            }
+        }
+
+        function showAddModal() {
+            document.getElementById('addModal').classList.replace('hidden', 'flex');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.replace('flex', 'hidden');
+        }
+
+        document.getElementById('addForm').onsubmit = e => {
+            e.preventDefault();
+            const f = e.target;
+            skills.unshift({
+                id: Date.now(),
+                name: f.name.value,
+                category: f.category.value,
+                source: f.source.value || 'custom',
+                url: f.url.value,
+                desc: f.desc.value,
+                tags: f.tags.value.split(' ').filter(Boolean),
+                status: 'not-started',
+                progress: 0,
+                uses: 0,
+                icon: '📦'
+            });
+            save();
+            renderTags();
+            renderSkills();
+            closeModal('addModal');
+            f.reset();
+        };
+
+        document.getElementById('searchInput').oninput = renderSkills;
+
+        // Init
+        updateStats();
+        renderTags();
+        renderSkills();
+    </script>
+</body>
+</html>
