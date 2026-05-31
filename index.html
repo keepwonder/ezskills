@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EzSkills - 个人技能库</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%23151713'/><text x='32' y='42' text-anchor='middle' font-size='30' font-family='Arial' font-weight='700' fill='%23f7f2e8'>S</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
@@ -20,6 +20,88 @@
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         main { flex: 1; }
+
+
+        /* Kiang visual system */
+        :root {
+            --paper: #f7f2e8;
+            --paper-soft: #fffdf8;
+            --ink: #151713;
+            --muted: #62685f;
+            --line: rgba(21, 23, 19, 0.14);
+            --emerald: #047a55;
+            --emerald-strong: #035f43;
+            --amber: #bd6b1b;
+            --clay: #8f4d35;
+            --shadow: 0 18px 48px rgba(43, 36, 24, 0.12);
+            --radius: 8px;
+        }
+        body {
+            color: var(--ink) !important;
+            background:
+                linear-gradient(rgba(21, 23, 19, 0.035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(21, 23, 19, 0.035) 1px, transparent 1px),
+                radial-gradient(circle at 18% 0%, rgba(4, 122, 85, 0.10), transparent 32%),
+                var(--paper) !important;
+            background-size: 42px 42px, 42px 42px, auto, auto !important;
+        }
+        .glass,
+        footer.bg-white {
+            background: rgba(247, 242, 232, 0.88) !important;
+            border-color: var(--line) !important;
+            backdrop-filter: blur(16px);
+        }
+        h1, h2, h3, .text-slate-800 { color: var(--ink) !important; }
+        .text-slate-500, .text-slate-600 { color: var(--muted) !important; }
+        .bg-white { background: rgba(255, 253, 248, 0.84) !important; }
+        .border-slate-200, .border-gray-200 { border-color: var(--line) !important; }
+        .bg-emerald-600,
+        .bg-violet-600,
+        .tag-active,
+        .category-active {
+            background: var(--ink) !important;
+            color: var(--paper-soft) !important;
+        }
+        .hover\:bg-emerald-700:hover,
+        .hover\:bg-violet-700:hover { background: #2a2d25 !important; }
+        .text-emerald-600,
+        .text-violet-600,
+        .hover\:text-emerald-600:hover,
+        .hover\:text-violet-600:hover { color: var(--emerald) !important; }
+        .focus\:border-emerald-500:focus,
+        .focus\:border-violet-500:focus { border-color: var(--emerald) !important; }
+        .rounded-xl, .rounded-2xl, .rounded-lg { border-radius: var(--radius) !important; }
+        input, textarea, select {
+            background: rgba(255, 253, 248, 0.9) !important;
+            border-color: var(--line) !important;
+            color: var(--ink) !important;
+        }
+        button, a { transition-duration: 160ms !important; }
+        .card-hover:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: var(--shadow) !important;
+        }
+        #tagsContainer button,
+        .category-btn {
+            border-radius: var(--radius) !important;
+            box-shadow: none !important;
+        }
+        main section > h2,
+        section h2.text-sm {
+            letter-spacing: 0.08em;
+            color: var(--clay) !important;
+        }
+        .grid button .bg-blue-100,
+        .grid button .bg-purple-100,
+        .grid button .bg-green-100,
+        .grid button .bg-orange-100,
+        .grid button .bg-red-100,
+        .grid button .bg-pink-100 {
+            background: rgba(21, 23, 19, 0.05) !important;
+            color: var(--ink) !important;
+            border: 1px solid var(--line);
+        }
+        .fixed .bg-white { background: var(--paper-soft) !important; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-violet-50 to-purple-50 min-h-screen">
@@ -28,7 +110,7 @@
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div class="flex items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center text-white text-2xl">📚</div>
+                    <div class="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center text-white text-2xl">S</div>
                     <h1 class="text-xl font-bold text-slate-800">EzSkills</h1>
                 </div>
                 <div class="flex-1 max-w-xl">
@@ -70,12 +152,12 @@
         <!-- Categories -->
         <div class="flex flex-wrap gap-2 mb-4">
             <button onclick="filterCategory('all')" class="category-btn category-active px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="all">全部</button>
-            <button onclick="filterCategory('ai-coding')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="ai-coding">🤖 AI编程</button>
-            <button onclick="filterCategory('frontend')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="frontend">⚛️ 前端</button>
-            <button onclick="filterCategory('backend')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="backend">⚙️ 后端</button>
-            <button onclick="filterCategory('tools')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="tools">🛠️ 工具</button>
-            <button onclick="filterCategory('content')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="content">✍️ 内容</button>
-            <button onclick="filterCategory('design')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="design">🎨 设计</button>
+            <button onclick="filterCategory('ai-coding')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="ai-coding">AI编程</button>
+            <button onclick="filterCategory('frontend')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="frontend">前端</button>
+            <button onclick="filterCategory('backend')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="backend">后端</button>
+            <button onclick="filterCategory('tools')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="tools">工具</button>
+            <button onclick="filterCategory('content')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="content">内容</button>
+            <button onclick="filterCategory('design')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="design">设计</button>
         </div>
 
         <!-- Tags -->
@@ -96,7 +178,7 @@
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center text-white text-lg">📚</div>
+                    <div class="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center text-white text-lg">S</div>
                     <span class="text-slate-600 text-sm">EzSkills - 个人技能库</span>
                 </div>
                 <div class="flex items-center gap-6 text-sm text-slate-500">
@@ -119,12 +201,12 @@
             <form id="addForm" class="space-y-4">
                 <input type="text" name="name" required placeholder="技能名称" class="w-full px-4 py-2 border rounded-xl">
                 <select name="category" class="w-full px-4 py-2 border rounded-xl">
-                    <option value="ai-coding">🤖 AI编程</option>
-                    <option value="frontend">⚛️ 前端</option>
-                    <option value="backend">⚙️ 后端</option>
-                    <option value="tools">🛠️ 工具</option>
-                    <option value="content">✍️ 内容</option>
-                    <option value="design">🎨 设计</option>
+                    <option value="ai-coding">AI编程</option>
+                    <option value="frontend">前端</option>
+                    <option value="backend">后端</option>
+                    <option value="tools">工具</option>
+                    <option value="content">内容</option>
+                    <option value="design">设计</option>
                 </select>
                 <input type="text" name="source" placeholder="来源 (如: skills.sh, clawhub)" class="w-full px-4 py-2 border rounded-xl">
                 <input type="url" name="url" placeholder="文档链接" class="w-full px-4 py-2 border rounded-xl">
@@ -173,12 +255,12 @@
 
         // Category Names
         const categoryNames = {
-            'ai-coding': '🤖 AI编程',
-            'frontend': '⚛️ 前端',
-            'backend': '⚙️ 后端',
-            'tools': '🛠️ 工具',
-            'content': '✍️ 内容',
-            'design': '🎨 设计'
+            'ai-coding': 'AI编程',
+            'frontend': '前端',
+            'backend': '后端',
+            'tools': '工具',
+            'content': '内容',
+            'design': '设计'
         };
 
         function save() {
@@ -303,7 +385,7 @@
                     <button onclick="incrementUse(${s.id})" class="py-2 bg-violet-600 text-white rounded-xl">+1 使用</button>
                 </div>
                 
-                ${s.url ? `<a href="${s.url}" target="_blank" class="block text-center py-2 bg-violet-50 text-violet-600 rounded-xl">查看文档 →</a>` : ''}
+                ${s.url ? `<a href="${s.url}" target="_blank" class="block text-center py-2 bg-violet-50 text-violet-600 rounded-xl">查看文档 -></a>` : ''}
             `;
             document.getElementById('detailModal').classList.replace('hidden', 'flex');
         }
