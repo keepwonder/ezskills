@@ -1913,7 +1913,7 @@
         }
 
         closeDetail();
-        editDialog.showModal();
+        if (!editDialog.open) editDialog.showModal();
         window.setTimeout(function () {
           nameInput.focus();
           if (skill) nameInput.select();
@@ -1947,7 +1947,7 @@
         confirmDialog.returnValue = '';
         return new Promise(function (resolve) {
           confirmResolver = resolve;
-          confirmDialog.showModal();
+          if (!confirmDialog.open) confirmDialog.showModal();
         });
       }
 
@@ -2256,6 +2256,7 @@
 
         document.addEventListener('keydown', function (event) {
           if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) return;
+          if (document.querySelector('dialog[open]')) return;
           var target = event.target;
           var tagName = target && target.tagName ? target.tagName : '';
           if (tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT' || (target && target.isContentEditable)) return;
