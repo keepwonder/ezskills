@@ -1,453 +1,2280 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EzSkills - 个人技能库</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%23151713'/><text x='32' y='42' text-anchor='middle' font-size='30' font-family='Arial' font-weight='700' fill='%23f7f2e8'>S</text></svg>">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        * { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif; }
-        html, body { height: 100%; }
-        body { display: flex; flex-direction: column; }
-        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
-        .card-hover { transition: all 0.3s; }
-        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.15); }
-        .tag-active { background: #8b5cf6; color: white; }
-        .category-active { background: #8b5cf6; color: white; }
-        .progress-bar { transition: width 0.3s ease; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-        main { flex: 1; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EzSkills · 个人技能库</title>
+  <meta name="description" content="EzSkills 是 Kiang 的个人技能库：把 AI 编程、前端、后端、工具、内容、设计六大类技能收在同一张表里，记录学习状态、使用次数与进度。">
+  <meta name="author" content="Kiang">
+  <meta name="theme-color" content="#f7f2e8" id="theme-color">
+  <link rel="canonical" href="https://ezskills.kiang.website/">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%23151713'/><text x='32' y='43' text-anchor='middle' font-size='32' font-family='Georgia,serif' font-weight='700' fill='%23f7f2e8'>S</text></svg>">
 
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="EzSkills">
+  <meta property="og:title" content="EzSkills · 个人技能库">
+  <meta property="og:description" content="把会用的技能整理成一张地图：六大分类、学习状态、使用次数与进度，数据存在浏览器本地。">
+  <meta property="og:url" content="https://ezskills.kiang.website/">
+  <meta property="og:image" content="https://kiang.website/og/ezskills.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="EzSkills 个人技能库">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="EzSkills · 个人技能库">
+  <meta name="twitter:description" content="把会用的技能整理成一张地图：六大分类、学习状态、使用次数与进度。">
+  <meta name="twitter:image" content="https://kiang.website/og/ezskills.jpg">
 
-        /* Kiang visual system */
-        :root {
-            --paper: #f7f2e8;
-            --paper-soft: #fffdf8;
-            --ink: #151713;
-            --muted: #62685f;
-            --line: rgba(21, 23, 19, 0.14);
-            --emerald: #047a55;
-            --emerald-strong: #035f43;
-            --amber: #bd6b1b;
-            --clay: #8f4d35;
-            --shadow: 0 18px 48px rgba(43, 36, 24, 0.12);
-            --radius: 8px;
-        }
-        body {
-            color: var(--ink) !important;
-            background:
-                linear-gradient(rgba(21, 23, 19, 0.035) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(21, 23, 19, 0.035) 1px, transparent 1px),
-                radial-gradient(circle at 18% 0%, rgba(4, 122, 85, 0.10), transparent 32%),
-                var(--paper) !important;
-            background-size: 42px 42px, 42px 42px, auto, auto !important;
-        }
-        .glass,
-        footer.bg-white {
-            background: rgba(247, 242, 232, 0.88) !important;
-            border-color: var(--line) !important;
-            backdrop-filter: blur(16px);
-        }
-        h1, h2, h3, .text-slate-800 { color: var(--ink) !important; }
-        .text-slate-500, .text-slate-600 { color: var(--muted) !important; }
-        .bg-white { background: rgba(255, 253, 248, 0.84) !important; }
-        .border-slate-200, .border-gray-200 { border-color: var(--line) !important; }
-        .bg-emerald-600,
-        .bg-violet-600,
-        .tag-active,
-        .category-active {
-            background: var(--ink) !important;
-            color: var(--paper-soft) !important;
-        }
-        .hover\:bg-emerald-700:hover,
-        .hover\:bg-violet-700:hover { background: #2a2d25 !important; }
-        .text-emerald-600,
-        .text-violet-600,
-        .hover\:text-emerald-600:hover,
-        .hover\:text-violet-600:hover { color: var(--emerald) !important; }
-        .focus\:border-emerald-500:focus,
-        .focus\:border-violet-500:focus { border-color: var(--emerald) !important; }
-        .rounded-xl, .rounded-2xl, .rounded-lg { border-radius: var(--radius) !important; }
-        input, textarea, select {
-            background: rgba(255, 253, 248, 0.9) !important;
-            border-color: var(--line) !important;
-            color: var(--ink) !important;
-        }
-        button, a { transition-duration: 160ms !important; }
-        .card-hover:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: var(--shadow) !important;
-        }
-        #tagsContainer button,
-        .category-btn {
-            border-radius: var(--radius) !important;
-            box-shadow: none !important;
-        }
-        main section > h2,
-        section h2.text-sm {
-            letter-spacing: 0.08em;
-            color: var(--clay) !important;
-        }
-        .grid button .bg-blue-100,
-        .grid button .bg-purple-100,
-        .grid button .bg-green-100,
-        .grid button .bg-orange-100,
-        .grid button .bg-red-100,
-        .grid button .bg-pink-100 {
-            background: rgba(21, 23, 19, 0.05) !important;
-            color: var(--ink) !important;
-            border: 1px solid var(--line);
-        }
-        .fixed .bg-white { background: var(--paper-soft) !important; }
-    </style>
+  <script>
+    (function () {
+      try {
+        var stored = localStorage.getItem('ezskills.theme');
+        var theme = (stored === 'light' || stored === 'dark')
+          ? stored
+          : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (err) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    })();
+  </script>
+
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "EzSkills",
+      "url": "https://ezskills.kiang.website/",
+      "description": "Kiang 的个人技能库，按 AI 编程、前端、后端、工具、内容、设计六大类组织。",
+      "isPartOf": { "@type": "WebSite", "name": "kiang.website", "url": "https://kiang.website/" },
+      "author": { "@type": "Person", "name": "Kiang", "url": "https://kiang.website/" }
+    }
+  </script>
+
+  <style>
+    :root {
+      --paper: #f7f2e8;
+      --paper-soft: #fffdf8;
+      --surface: rgba(255, 253, 248, 0.86);
+      --header-bg: rgba(247, 242, 232, 0.86);
+      --ink: #151713;
+      --muted: #5f665c;
+      --line: rgba(21, 23, 19, 0.13);
+      --line-strong: rgba(21, 23, 19, 0.24);
+      --wash: rgba(21, 23, 19, 0.045);
+      --emerald: #047a55;
+      --emerald-soft: rgba(4, 122, 85, 0.09);
+      --amber: #a95f14;
+      --amber-soft: rgba(169, 95, 20, 0.1);
+      --clay: #8f4d35;
+      --clay-soft: rgba(143, 77, 53, 0.1);
+      --grid-line: rgba(21, 23, 19, 0.035);
+      --grid-emerald: rgba(4, 122, 85, 0.1);
+      --shadow-soft: 0 1px 2px rgba(43, 36, 24, 0.05), 0 8px 24px rgba(43, 36, 24, 0.06);
+      --shadow-lift: 0 2px 6px rgba(43, 36, 24, 0.06), 0 18px 40px rgba(43, 36, 24, 0.12);
+      --btn-primary-bg: #151713;
+      --btn-primary-fg: #fffdf8;
+      --btn-primary-hover: #2a2d25;
+      --radius: 10px;
+      --radius-sm: 8px;
+      --pill: 999px;
+      --container: 1160px;
+      --font-display: Georgia, "Times New Roman", "Songti SC", "Noto Serif SC", serif;
+      --font-body: "Avenir Next", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --font-mono: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+      color-scheme: light;
+    }
+
+    [data-theme="dark"] {
+      --paper: #12140f;
+      --paper-soft: #1a1d16;
+      --surface: rgba(26, 29, 22, 0.9);
+      --header-bg: rgba(18, 20, 15, 0.86);
+      --ink: #e8eae2;
+      --muted: #9ba093;
+      --line: rgba(232, 234, 226, 0.14);
+      --line-strong: rgba(232, 234, 226, 0.28);
+      --wash: rgba(232, 234, 226, 0.06);
+      --emerald: #3fbb85;
+      --emerald-soft: rgba(63, 187, 133, 0.14);
+      --amber: #e0954a;
+      --amber-soft: rgba(224, 149, 74, 0.14);
+      --clay: #c98a6b;
+      --clay-soft: rgba(201, 138, 107, 0.14);
+      --grid-line: rgba(232, 234, 226, 0.045);
+      --grid-emerald: rgba(63, 187, 133, 0.12);
+      --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.34);
+      --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.34), 0 12px 32px rgba(0, 0, 0, 0.42);
+      --btn-primary-bg: #e8eae2;
+      --btn-primary-fg: #12140f;
+      --btn-primary-hover: #f7f9f1;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: flex;
+      flex-direction: column;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image:
+        linear-gradient(var(--grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+        radial-gradient(circle at 18% 0%, var(--grid-emerald), transparent 34%);
+      background-size: 42px 42px, 42px 42px, auto, auto;
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    button, input, select, textarea { font: inherit; color: inherit; }
+
+    button { cursor: pointer; }
+
+    svg { display: block; }
+
+    :focus-visible {
+      outline: 2px solid var(--emerald);
+      outline-offset: 2px;
+    }
+
+    ::selection {
+      background: var(--emerald-soft);
+      color: var(--ink);
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 200;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--ink);
+      color: var(--paper-soft);
+      transform: translateY(-160%);
+      transition: transform 160ms ease;
+    }
+
+    .skip-link:focus { transform: translateY(0); }
+
+    /* ---------- header ---------- */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--header-bg);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .header-inner {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-sm);
+      background: var(--ink);
+      color: var(--paper-soft);
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .brand-mark.small {
+      width: 30px;
+      height: 30px;
+      font-size: 16px;
+    }
+
+    .brand-text { display: flex; flex-direction: column; line-height: 1.15; }
+
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-sub {
+      margin-top: 2px;
+      font-family: var(--font-mono);
+      font-size: 8.5px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .search-wrap { position: relative; min-width: 0; }
+
+    .search-wrap > svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      height: 40px;
+      padding: 0 42px 0 38px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--paper-soft);
+      font-size: 13.5px;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .search-wrap input::placeholder { color: var(--muted); opacity: 0.78; }
+
+    .search-wrap input:focus {
+      outline: none;
+      border-color: var(--emerald);
+      box-shadow: 0 0 0 3px var(--emerald-soft);
+    }
+
+    .search-wrap kbd {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      background: var(--wash);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+    }
+
+    .header-actions { display: flex; align-items: center; gap: 8px; }
+
+    /* ---------- buttons ---------- */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      height: 36px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--paper-soft);
+      color: var(--ink);
+      font-size: 12.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .btn:hover { background: var(--wash); border-color: var(--line-strong); }
+    .btn:active { transform: translateY(1px); }
+
+    .btn-primary {
+      background: var(--btn-primary-bg);
+      border-color: var(--btn-primary-bg);
+      color: var(--btn-primary-fg);
+    }
+
+    .btn-primary:hover {
+      background: var(--btn-primary-hover);
+      border-color: var(--btn-primary-hover);
+      color: var(--btn-primary-fg);
+    }
+
+    .btn-danger { color: var(--clay); border-color: var(--clay-soft); }
+    .btn-danger:hover { background: var(--clay); border-color: var(--clay); color: var(--paper-soft); }
+
+    .btn-sm { height: 30px; padding: 0 10px; font-size: 11.5px; }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--paper-soft);
+      color: var(--ink);
+      transition: background-color 160ms ease, border-color 160ms ease;
+    }
+
+    .icon-btn:hover { background: var(--wash); border-color: var(--line-strong); }
+
+    .text-btn {
+      border: 0;
+      padding: 0;
+      background: none;
+      color: var(--emerald);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .text-btn:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+    /* theme icons */
+    .theme-toggle .icon-sun { display: none; }
+    .theme-toggle .icon-moon { display: block; }
+    [data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+    [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+
+    /* ---------- layout ---------- */
+    .page {
+      flex: 1;
+      width: 100%;
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 38px 24px 0;
+    }
+
+    .page-head { padding-bottom: 26px; }
+
+    .eyebrow {
+      margin: 0 0 10px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--clay);
+    }
+
+    h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 44px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+    }
+
+    .lede {
+      max-width: 62ch;
+      margin: 12px 0 0;
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    /* ---------- stats ---------- */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin: 0 0 28px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .stat {
+      padding: 15px 18px 14px;
+      border-left: 1px solid var(--line);
+    }
+
+    .stat:first-child { border-left: 0; }
+
+    .stat-value {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label {
+      display: block;
+      margin-top: 4px;
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .stat[data-tone="emerald"] .stat-value { color: var(--emerald); }
+    .stat[data-tone="amber"] .stat-value { color: var(--amber); }
+
+    /* ---------- filters ---------- */
+    .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .chip-row {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+
+    .chip-row::-webkit-scrollbar { display: none; }
+
+    .chip {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--pill);
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 12.5px;
+      white-space: nowrap;
+      transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+
+    .chip:hover { border-color: var(--line-strong); background: var(--paper-soft); }
+
+    .chip[aria-pressed="true"] {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--paper-soft);
+    }
+
+    .chip-count {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      opacity: 0.55;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chip[aria-pressed="true"] .chip-count { opacity: 0.72; }
+
+    .tag-bar {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .tag-label {
+      flex: none;
+      padding-top: 5px;
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      min-width: 0;
+    }
+
+    .tag {
+      height: 26px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--pill);
+      background: transparent;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      white-space: nowrap;
+      transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+
+    .tag:hover { border-color: var(--line-strong); color: var(--ink); }
+
+    .tag[aria-pressed="true"] {
+      border-color: var(--emerald);
+      background: var(--emerald-soft);
+      color: var(--emerald);
+    }
+
+    /* ---------- list head ---------- */
+    .list-head {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin: 26px 0 14px;
+      flex-wrap: wrap;
+    }
+
+    .list-head h2 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .result-count {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    #clear-filters { margin-left: auto; }
+
+    /* ---------- grid & cards ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--paper-soft);
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: var(--line-strong);
+      box-shadow: var(--shadow-lift);
+    }
+
+    .card:focus-visible { outline-offset: 3px; }
+
+    .card.is-new { animation: card-in 1.6s ease-out; }
+
+    @keyframes card-in {
+      0% { box-shadow: 0 0 0 2px var(--emerald); }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+
+    .card-top { display: flex; align-items: flex-start; gap: 12px; }
+
+    .card-icon {
+      width: 42px;
+      height: 42px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--wash);
+      font-size: 21px;
+      line-height: 1;
+    }
+
+    .card-heading { flex: 1; min-width: 0; }
+
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .card-name {
+      flex: 1;
+      min-width: 0;
+      margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .status {
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+      height: 20px;
+      padding: 0 8px;
+      border: 1px solid transparent;
+      border-radius: var(--pill);
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .status-idle { color: var(--muted); background: var(--wash); border-color: var(--line); }
+    .status-learning { color: var(--amber); background: var(--amber-soft); border-color: var(--amber-soft); }
+    .status-mastered { color: var(--emerald); background: var(--emerald-soft); border-color: var(--emerald-soft); }
+
+    .card-desc {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      min-height: 2.9em;
+      margin: 12px 0 0;
+      font-size: 12.8px;
+      line-height: 1.55;
+      color: var(--muted);
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 12px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .tag-chip {
+      padding: 2px 7px;
+      border-radius: var(--pill);
+      background: var(--wash);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .tag-chip.more { background: transparent; border: 1px dashed var(--line); }
+
+    .progress-block { margin-top: auto; padding-top: 18px; }
+
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .progress-track {
+      height: 6px;
+      border-radius: var(--pill);
+      background: var(--wash);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: var(--p, 0%);
+      border-radius: var(--pill);
+      background: var(--status-color, var(--emerald));
+      transition: width 320ms ease;
+    }
+
+    .card[data-status="learning"] { --status-color: var(--amber); }
+    .card[data-status="mastered"] { --status-color: var(--emerald); }
+    .card[data-status="not-started"] { --status-color: var(--muted); }
+
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    .card-source {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 62%;
+    }
+
+    .card-uses { flex: none; font-variant-numeric: tabular-nums; }
+
+    .empty {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: 64px 20px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 12px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .empty strong { font-size: 14px; color: var(--ink); }
+    .empty p { margin: 0; font-size: 12.5px; }
+
+    /* ---------- footer ---------- */
+    .site-footer {
+      margin-top: 56px;
+      border-top: 1px solid var(--line);
+      background: var(--header-bg);
+    }
+
+    .footer-inner {
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 24px 24px 40px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 18px 32px;
+    }
+
+    .footer-brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
+
+    .footer-name {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .footer-note {
+      margin: 2px 0 0;
+      font-size: 11.5px;
+      color: var(--muted);
+    }
+
+    .footer-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .footer-links {
+      grid-column: 1 / -1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 20px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .footer-links a:hover { color: var(--emerald); }
+
+    /* ---------- dialogs ---------- */
+    html:has(dialog[open]) { overflow: hidden; }
+
+    dialog {
+      width: min(92vw, 560px);
+      max-width: none;
+      max-height: none;
+      margin: auto;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+    }
+
+    dialog::backdrop {
+      background: rgba(10, 11, 8, 0.48);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+    }
+
+    dialog.dialog-sm { width: min(92vw, 420px); }
+
+    .dialog-card {
+      max-height: 86vh;
+      overflow: auto;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--paper-soft);
+      box-shadow: var(--shadow-lift);
+    }
+
+    .dialog-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    #detail-title,
+    .dialog-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      overflow-wrap: anywhere;
+    }
+
+    #detail-title {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+
+    .dialog-close { width: 30px; height: 30px; flex: none; }
+
+    /* detail */
+    .detail-hero {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin: 16px 0 0;
+    }
+
+    .detail-icon {
+      width: 56px;
+      height: 56px;
+      flex: none;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--wash);
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .detail-heading { min-width: 0; }
+
+    .detail-name {
+      margin: 0;
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 12px;
+      margin-top: 5px;
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--muted);
+    }
+
+    .detail-desc {
+      margin: 14px 0 0;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--muted);
+      white-space: pre-line;
+      overflow-wrap: anywhere;
+    }
+
+    .detail-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 14px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .detail-progress { margin: 20px 0 0; }
+
+    .status-group {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 18px;
+    }
+
+    .status-btn {
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+      transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+
+    .status-btn:hover { background: var(--wash); }
+
+    .status-btn[aria-pressed="true"][data-status="not-started"] {
+      border-color: var(--line-strong);
+      background: var(--wash);
+      color: var(--ink);
+    }
+
+    .status-btn[aria-pressed="true"][data-status="learning"] {
+      border-color: var(--amber-soft);
+      background: var(--amber-soft);
+      color: var(--amber);
+    }
+
+    .status-btn[aria-pressed="true"][data-status="mastered"] {
+      border-color: var(--emerald-soft);
+      background: var(--emerald-soft);
+      color: var(--emerald);
+    }
+
+    .detail-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .detail-actions .btn-primary { flex: 1; }
+
+    .detail-link { width: 100%; margin-top: 8px; justify-content: space-between; }
+
+    .detail-link span:last-child { font-family: var(--font-mono); font-size: 11px; opacity: 0.7; }
+
+    /* form */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .field.full { grid-column: 1 / -1; }
+
+    .field label {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .field .req { color: var(--clay); }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      height: 38px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--paper);
+      color: var(--ink);
+      font-size: 13px;
+      transition: border-color 160ms ease, box-shadow 160ms ease;
+    }
+
+    .field textarea {
+      height: 82px;
+      padding: 9px 10px;
+      line-height: 1.5;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: var(--emerald);
+      box-shadow: 0 0 0 3px var(--emerald-soft);
+    }
+
+    .field input::placeholder,
+    .field textarea::placeholder { color: var(--muted); opacity: 0.7; }
+
+    .form-error {
+      margin: 12px 0 0;
+      padding: 8px 10px;
+      border: 1px solid var(--clay-soft);
+      border-radius: var(--radius-sm);
+      background: var(--clay-soft);
+      color: var(--clay);
+      font-size: 12px;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .confirm-message {
+      margin: 12px 0 0;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--muted);
+    }
+
+    /* ---------- toast ---------- */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 22px;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      max-width: calc(100vw - 32px);
+      padding: 11px 16px;
+      border-radius: var(--pill);
+      background: var(--ink);
+      color: var(--paper);
+      box-shadow: var(--shadow-lift);
+      font-size: 12.5px;
+      opacity: 0;
+      transform: translate(-50%, 12px);
+      pointer-events: none;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+      pointer-events: auto;
+    }
+
+    .toast button {
+      flex: none;
+      padding: 0;
+      border: 0;
+      background: none;
+      color: inherit;
+      font-weight: 700;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* ---------- responsive ---------- */
+    @media (max-width: 720px) {
+      .header-inner {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px 12px;
+        padding: 10px 20px 12px;
+      }
+
+      .search-wrap { grid-column: 1 / -1; grid-row: 2; }
+
+      .brand-sub { display: none; }
+
+      .page { padding: 28px 20px 0; }
+
+      h1 { font-size: 36px; }
+
+      .lede { font-size: 13.5px; }
+
+      .stats { grid-template-columns: 1fr 1fr; }
+
+      .stat:nth-child(3) { border-left: 0; border-top: 1px solid var(--line); }
+      .stat:nth-child(4) { border-top: 1px solid var(--line); }
+
+      .tag-row {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+      }
+
+      .tag-row::-webkit-scrollbar { display: none; }
+
+      .grid { grid-template-columns: 1fr; }
+
+      .footer-inner { grid-template-columns: 1fr; padding: 22px 20px 36px; }
+      .footer-actions { order: 3; }
+
+      .dialog-card { padding: 18px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .detail-actions .btn-primary { flex: 1 1 100%; }
+    }
+
+    @media (max-width: 420px) {
+      .header-actions .btn span { display: none; }
+      .header-actions .btn { width: 36px; padding: 0; }
+      .search-wrap kbd { display: none; }
+      .search-wrap input { padding-right: 14px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-violet-50 to-purple-50 min-h-screen">
-    <!-- Header -->
-    <header class="glass sticky top-0 z-50 border-b border-slate-200">
-        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div class="flex items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-violet-600 rounded-xl flex items-center justify-center text-white text-2xl">S</div>
-                    <h1 class="text-xl font-bold text-slate-800">EzSkills</h1>
-                </div>
-                <div class="flex-1 max-w-xl">
-                    <input type="text" id="searchInput" placeholder="搜索技能、标签、来源..."
-                        class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-violet-500">
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="showAddModal()" class="p-2 bg-violet-600 text-white rounded-xl hover:bg-violet-700">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </header>
+<body>
+  <a class="skip-link" href="#skills">跳到技能列表</a>
 
-    <main class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
-        <!-- Stats -->
-        <div class="grid grid-cols-4 gap-4 mb-6">
-            <div class="bg-white rounded-xl p-4 border border-slate-200">
-                <div class="text-2xl font-bold text-violet-600"><span id="totalSkills">0</span></div>
-                <div class="text-xs text-slate-500">总技能</div>
-            </div>
-            <div class="bg-white rounded-xl p-4 border border-slate-200">
-                <div class="text-2xl font-bold text-blue-600"><span id="learningSkills">0</span></div>
-                <div class="text-xs text-slate-500">学习中</div>
-            </div>
-            <div class="bg-white rounded-xl p-4 border border-slate-200">
-                <div class="text-2xl font-bold text-green-600"><span id="masteredSkills">0</span></div>
-                <div class="text-xs text-slate-500">已掌握</div>
-            </div>
-            <div class="bg-white rounded-xl p-4 border border-slate-200">
-                <div class="text-2xl font-bold text-orange-600"><span id="totalUses">0</span></div>
-                <div class="text-xs text-slate-500">总使用</div>
-            </div>
-        </div>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="/" aria-label="EzSkills 首页">
+        <span class="brand-mark" aria-hidden="true">S</span>
+        <span class="brand-text">
+          <span class="brand-name">EzSkills</span>
+          <span class="brand-sub">Personal Skill Library</span>
+        </span>
+      </a>
 
-        <!-- Categories -->
-        <div class="flex flex-wrap gap-2 mb-4">
-            <button onclick="filterCategory('all')" class="category-btn category-active px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="all">全部</button>
-            <button onclick="filterCategory('ai-coding')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="ai-coding">AI编程</button>
-            <button onclick="filterCategory('frontend')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="frontend">前端</button>
-            <button onclick="filterCategory('backend')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="backend">后端</button>
-            <button onclick="filterCategory('tools')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="tools">工具</button>
-            <button onclick="filterCategory('content')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="content">内容</button>
-            <button onclick="filterCategory('design')" class="category-btn bg-white px-4 py-2 rounded-full text-sm font-medium border border-slate-200 transition-all" data-category="design">设计</button>
-        </div>
+      <div class="search-wrap">
+        <label class="visually-hidden" for="search">搜索技能</label>
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"></circle>
+          <path d="m20 20-3.6-3.6"></path>
+        </svg>
+        <input id="search" type="search" placeholder="搜索技能、标签、来源…" autocomplete="off" spellcheck="false">
+        <kbd aria-hidden="true">/</kbd>
+      </div>
 
-        <!-- Tags -->
-        <div id="tagsContainer" class="flex flex-wrap gap-2 mb-6"></div>
-
-        <!-- Skills Grid -->
-        <section>
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-bold text-slate-800">技能库</h2>
-                <span id="skillsCount" class="text-sm text-slate-500">0 个技能</span>
-            </div>
-            <div id="skillsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-white border-t border-slate-200 mt-12">
-        <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-violet-600 rounded-lg flex items-center justify-center text-white text-lg">S</div>
-                    <span class="text-slate-600 text-sm">EzSkills - 个人技能库</span>
-                </div>
-                <div class="flex items-center gap-6 text-sm text-slate-500">
-                    <a href="https://keepwonder.top" class="hover:text-violet-600 transition-colors">主页</a>
-                    <a href="https://skills.sh" target="_blank" class="hover:text-violet-600 transition-colors">Skills.sh</a>
-                    <a href="https://clawhub.ai" target="_blank" class="hover:text-violet-600 transition-colors">ClawHub</a>
-                    <span>© 2026</span>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Add Skill Modal -->
-    <div id="addModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-md p-6">
-            <div class="flex justify-between mb-4">
-                <h3 class="text-lg font-bold">添加技能</h3>
-                <button onclick="closeModal('addModal')" class="text-slate-400">✕</button>
-            </div>
-            <form id="addForm" class="space-y-4">
-                <input type="text" name="name" required placeholder="技能名称" class="w-full px-4 py-2 border rounded-xl">
-                <select name="category" class="w-full px-4 py-2 border rounded-xl">
-                    <option value="ai-coding">AI编程</option>
-                    <option value="frontend">前端</option>
-                    <option value="backend">后端</option>
-                    <option value="tools">工具</option>
-                    <option value="content">内容</option>
-                    <option value="design">设计</option>
-                </select>
-                <input type="text" name="source" placeholder="来源 (如: skills.sh, clawhub)" class="w-full px-4 py-2 border rounded-xl">
-                <input type="url" name="url" placeholder="文档链接" class="w-full px-4 py-2 border rounded-xl">
-                <textarea name="desc" placeholder="描述" rows="3" class="w-full px-4 py-2 border rounded-xl"></textarea>
-                <input type="text" name="tags" placeholder="标签（空格分隔）" class="w-full px-4 py-2 border rounded-xl">
-                <div class="flex gap-3">
-                    <button type="button" onclick="closeModal('addModal')" class="flex-1 py-2 border rounded-xl">取消</button>
-                    <button type="submit" class="flex-1 py-2 bg-violet-600 text-white rounded-xl">添加</button>
-                </div>
-            </form>
-        </div>
+      <div class="header-actions">
+        <button class="icon-btn theme-toggle" id="theme-toggle" type="button" aria-label="切换深色模式">
+          <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"></path>
+          </svg>
+          <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2"></circle>
+            <path d="M12 2v2.4M12 19.6V22M2 12h2.4M19.6 12H22M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"></path>
+          </svg>
+        </button>
+        <button class="btn btn-primary" id="add-btn" type="button" aria-label="添加技能">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+            <path d="M12 5v14M5 12h14"></path>
+          </svg>
+          <span>添加技能</span>
+        </button>
+      </div>
     </div>
+  </header>
 
-    <!-- Skill Detail Modal -->
-    <div id="detailModal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-2xl w-full max-w-lg p-6">
-            <div class="flex justify-between mb-4">
-                <h3 id="detailTitle" class="text-lg font-bold">技能详情</h3>
-                <button onclick="closeModal('detailModal')" class="text-slate-400">✕</button>
-            </div>
-            <div id="detailContent" class="space-y-4"></div>
+  <main class="page" id="main">
+    <section class="page-head" aria-labelledby="page-title">
+      <p class="eyebrow">Personal Skill Library</p>
+      <h1 id="page-title">技能库</h1>
+      <p class="lede">AI 编程、前端、后端、工具、内容、设计——把正在学和已掌握的技能收在同一张表里，随时知道下一步该练什么。</p>
+    </section>
+
+    <section class="stats" aria-label="技能统计">
+      <div class="stat">
+        <span class="stat-value" id="stat-total">0</span>
+        <span class="stat-label">总技能</span>
+      </div>
+      <div class="stat" data-tone="emerald">
+        <span class="stat-value" id="stat-mastered">0</span>
+        <span class="stat-label">已掌握</span>
+      </div>
+      <div class="stat" data-tone="amber">
+        <span class="stat-value" id="stat-learning">0</span>
+        <span class="stat-label">学习中</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="stat-uses">0</span>
+        <span class="stat-label">总使用</span>
+      </div>
+    </section>
+
+    <section class="toolbar" aria-label="筛选技能">
+      <div class="chip-row" id="category-chips" role="group" aria-label="按分类筛选"></div>
+      <div class="tag-bar">
+        <span class="tag-label" id="tag-label">标签</span>
+        <div class="tag-row" id="tag-chips" role="group" aria-labelledby="tag-label"></div>
+      </div>
+    </section>
+
+    <section id="skills" aria-labelledby="skills-title">
+      <div class="list-head">
+        <h2 id="skills-title">技能</h2>
+        <p class="result-count" id="result-count" aria-live="polite">0 个</p>
+        <button class="text-btn" id="clear-filters" type="button" hidden>清除筛选</button>
+      </div>
+      <div class="grid" id="grid"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <span class="brand-mark small" aria-hidden="true">S</span>
+        <div>
+          <p class="footer-name">EzSkills</p>
+          <p class="footer-note">数据仅保存在本机浏览器，建议定期导出备份。</p>
         </div>
+      </div>
+      <div class="footer-actions">
+        <button class="btn btn-sm" type="button" data-data-action="export">导出 JSON</button>
+        <button class="btn btn-sm" type="button" data-data-action="import">导入</button>
+        <button class="btn btn-sm" type="button" data-data-action="reset">恢复示例</button>
+        <input type="file" id="import-file" accept="application/json,.json" hidden>
+      </div>
+      <div class="footer-links">
+        <a href="https://kiang.website" target="_blank" rel="noopener">主站 ↗</a>
+        <a href="https://github.com/keepwonder/ezskills" target="_blank" rel="noopener">GitHub ↗</a>
+        <a href="https://skills.sh" target="_blank" rel="noopener">Skills.sh ↗</a>
+        <a href="https://clawhub.ai" target="_blank" rel="noopener">ClawHub ↗</a>
+        <span>© 2026 Kiang</span>
+      </div>
     </div>
+  </footer>
 
-    <script>
-        // Default Skills Data
-        const defaultSkills = [
-            { id: 1, name: 'find-skills', category: 'tools', source: 'skills.sh', url: 'https://skills.sh', desc: '发现并安装新的 Agent Skills', tags: ['skills', 'discovery'], status: 'mastered', progress: 100, uses: 42, icon: '🔍' },
-            { id: 2, name: 'vercel-react-best-practices', category: 'frontend', source: 'skills.sh', url: 'https://skills.sh', desc: 'Vercel React 开发最佳实践', tags: ['react', 'vercel', 'best-practices'], status: 'learning', progress: 60, uses: 15, icon: '⚛️' },
-            { id: 3, name: 'remotion-best-practices', category: 'content', source: 'skills.sh', url: 'https://skills.sh', desc: 'Remotion 视频制作最佳实践', tags: ['video', 'remotion', 'react'], status: 'learning', progress: 30, uses: 5, icon: '🎬' },
-            { id: 4, name: 'frontend-design', category: 'design', source: 'skills.sh', url: 'https://skills.sh', desc: '前端设计指南', tags: ['design', 'frontend', 'ui'], status: 'mastered', progress: 100, uses: 28, icon: '🎨' },
-            { id: 5, name: 'feishu-doc-writer', category: 'tools', source: 'clawhub', url: 'https://clawhub.ai', desc: '飞书文档写入技能', tags: ['feishu', 'docs', 'api'], status: 'mastered', progress: 100, uses: 56, icon: '📝' },
-            { id: 6, name: 'agent-reach', category: 'tools', source: 'clawhub', url: 'https://clawhub.ai', desc: '网络内容获取技能', tags: ['web', 'scrape', 'api'], status: 'learning', progress: 75, uses: 23, icon: '🌐' },
-            { id: 7, name: 'web-design-guidelines', category: 'design', source: 'skills.sh', url: 'https://skills.sh', desc: '网页设计规范', tags: ['design', 'web', 'css'], status: 'learning', progress: 45, uses: 12, icon: '🖼️' },
-            { id: 8, name: 'claude-code', category: 'ai-coding', source: 'anthropic', url: 'https://claude.ai', desc: 'Claude Code AI 编程助手', tags: ['ai', 'claude', 'coding'], status: 'mastered', progress: 100, uses: 128, icon: '🤖' },
-            { id: 9, name: 'azure-ai', category: 'backend', source: 'skills.sh', url: 'https://skills.sh', desc: 'Azure AI 服务集成', tags: ['azure', 'ai', 'cloud'], status: 'not-started', progress: 0, uses: 0, icon: '☁️' },
-            { id: 10, name: 'cursor-ide', category: 'ai-coding', source: 'cursor.sh', url: 'https://cursor.sh', desc: 'Cursor IDE 使用技巧', tags: ['cursor', 'ide', 'ai'], status: 'learning', progress: 80, uses: 45, icon: '💻' },
-            { id: 11, name: 'docker-basics', category: 'backend', source: 'docker.com', url: 'https://docker.com', desc: 'Docker 容器基础', tags: ['docker', 'container', 'devops'], status: 'mastered', progress: 100, uses: 67, icon: '🐳' },
-            { id: 12, name: 'git-workflow', category: 'tools', source: 'git-scm.com', url: 'https://git-scm.com', desc: 'Git 工作流最佳实践', tags: ['git', 'version-control'], status: 'mastered', progress: 100, uses: 89, icon: '🌿' },
-        ];
+  <dialog id="detail-dialog" aria-labelledby="detail-title">
+    <div class="dialog-card">
+      <div class="dialog-head">
+        <h2 class="dialog-title" id="detail-title">技能详情</h2>
+        <button class="icon-btn dialog-close" type="button" data-close aria-label="关闭详情">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="detail-body"></div>
+    </div>
+  </dialog>
 
-        // Data
-        let skills = JSON.parse(localStorage.getItem('ezskills_data')) || [...defaultSkills];
-        let currentCategory = 'all';
-        let currentTag = 'all';
+  <dialog id="edit-dialog" aria-labelledby="edit-title">
+    <div class="dialog-card">
+      <div class="dialog-head">
+        <h2 class="dialog-title" id="edit-title">添加技能</h2>
+        <button class="icon-btn dialog-close" type="button" data-close aria-label="关闭表单">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6L6 18"></path>
+          </svg>
+        </button>
+      </div>
+      <form id="edit-form" novalidate>
+        <div class="form-grid">
+          <div class="field full">
+            <label for="field-name">名称 <span class="req">*</span></label>
+            <input id="field-name" name="name" required maxlength="80" placeholder="例如 find-skills" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="field-category">分类</label>
+            <select id="field-category" name="category">
+              <option value="ai-coding">AI 编程</option>
+              <option value="frontend">前端</option>
+              <option value="backend">后端</option>
+              <option value="tools">工具</option>
+              <option value="content">内容</option>
+              <option value="design">设计</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="field-status">状态</label>
+            <select id="field-status" name="status">
+              <option value="not-started">未开始</option>
+              <option value="learning">学习中</option>
+              <option value="mastered">已掌握</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="field-source">来源</label>
+            <input id="field-source" name="source" maxlength="40" placeholder="skills.sh / clawhub / 自定义" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="field-icon">图标</label>
+            <input id="field-icon" name="icon" maxlength="8" placeholder="📦" autocomplete="off">
+          </div>
+          <div class="field full">
+            <label for="field-url">文档链接</label>
+            <input id="field-url" name="url" type="url" inputmode="url" maxlength="500" placeholder="https://" autocomplete="off">
+          </div>
+          <div class="field full">
+            <label for="field-desc">描述</label>
+            <textarea id="field-desc" name="desc" maxlength="300" placeholder="一句话说明它能做什么"></textarea>
+          </div>
+          <div class="field full">
+            <label for="field-tags">标签</label>
+            <input id="field-tags" name="tags" maxlength="200" placeholder="用空格或逗号分隔，例如 react vercel best-practices" autocomplete="off">
+          </div>
+        </div>
+        <p class="form-error" id="form-error" role="alert" hidden></p>
+        <div class="form-actions">
+          <button class="btn" type="button" data-close>取消</button>
+          <button class="btn btn-primary" type="submit" id="edit-submit">保存</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
 
-        // Category Names
-        const categoryNames = {
-            'ai-coding': 'AI编程',
-            'frontend': '前端',
-            'backend': '后端',
-            'tools': '工具',
-            'content': '内容',
-            'design': '设计'
+  <dialog id="confirm-dialog" class="dialog-sm" aria-labelledby="confirm-title">
+    <div class="dialog-card">
+      <h2 class="dialog-title" id="confirm-title">确认</h2>
+      <p class="confirm-message" id="confirm-message"></p>
+      <div class="form-actions">
+        <button class="btn" type="button" data-confirm="cancel">取消</button>
+        <button class="btn btn-primary" type="button" data-confirm="ok" id="confirm-ok">确认</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">
+    <span id="toast-message"></span>
+    <button type="button" id="toast-action" hidden></button>
+  </div>
+
+  <noscript>
+    <p style="max-width:1160px;margin:24px auto;padding:0 24px;color:#5f665c;">EzSkills 需要 JavaScript 才能渲染技能卡片。</p>
+  </noscript>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ================= data ================= */
+      var STORAGE_KEY = 'ezskills.data.v2';
+      var LEGACY_KEY = 'ezskills_data';
+      var THEME_KEY = 'ezskills.theme';
+
+      var CATEGORIES = [
+        { id: 'all', name: '全部' },
+        { id: 'ai-coding', name: 'AI 编程' },
+        { id: 'frontend', name: '前端' },
+        { id: 'backend', name: '后端' },
+        { id: 'tools', name: '工具' },
+        { id: 'content', name: '内容' },
+        { id: 'design', name: '设计' }
+      ];
+
+      var CATEGORY_NAMES = {
+        'ai-coding': 'AI 编程',
+        frontend: '前端',
+        backend: '后端',
+        tools: '工具',
+        content: '内容',
+        design: '设计'
+      };
+
+      var STATUS = {
+        'not-started': { label: '未开始', className: 'status-idle' },
+        learning: { label: '学习中', className: 'status-learning' },
+        mastered: { label: '已掌握', className: 'status-mastered' }
+      };
+
+      var DEFAULT_SKILLS = [
+        { id: '1', name: 'find-skills', category: 'tools', source: 'skills.sh', url: 'https://skills.sh', desc: '发现并安装新的 Agent Skills', tags: ['skills', 'discovery'], status: 'mastered', progress: 100, uses: 42, icon: '🔍' },
+        { id: '2', name: 'vercel-react-best-practices', category: 'frontend', source: 'skills.sh', url: 'https://skills.sh', desc: 'Vercel React 开发最佳实践', tags: ['react', 'vercel', 'best-practices'], status: 'learning', progress: 60, uses: 15, icon: '⚛️' },
+        { id: '3', name: 'remotion-best-practices', category: 'content', source: 'skills.sh', url: 'https://skills.sh', desc: 'Remotion 视频制作最佳实践', tags: ['video', 'remotion', 'react'], status: 'learning', progress: 30, uses: 5, icon: '🎬' },
+        { id: '4', name: 'frontend-design', category: 'design', source: 'skills.sh', url: 'https://skills.sh', desc: '前端设计指南', tags: ['design', 'frontend', 'ui'], status: 'mastered', progress: 100, uses: 28, icon: '🎨' },
+        { id: '5', name: 'feishu-doc-writer', category: 'tools', source: 'clawhub', url: 'https://clawhub.ai', desc: '飞书文档写入技能', tags: ['feishu', 'docs', 'api'], status: 'mastered', progress: 100, uses: 56, icon: '📝' },
+        { id: '6', name: 'agent-reach', category: 'tools', source: 'clawhub', url: 'https://clawhub.ai', desc: '网络内容获取技能', tags: ['web', 'scrape', 'api'], status: 'learning', progress: 75, uses: 23, icon: '🌐' },
+        { id: '7', name: 'web-design-guidelines', category: 'design', source: 'skills.sh', url: 'https://skills.sh', desc: '网页设计规范', tags: ['design', 'web', 'css'], status: 'learning', progress: 45, uses: 12, icon: '🖼️' },
+        { id: '8', name: 'claude-code', category: 'ai-coding', source: 'anthropic', url: 'https://claude.ai', desc: 'Claude Code AI 编程助手', tags: ['ai', 'claude', 'coding'], status: 'mastered', progress: 100, uses: 128, icon: '🤖' },
+        { id: '9', name: 'azure-ai', category: 'backend', source: 'skills.sh', url: 'https://skills.sh', desc: 'Azure AI 服务集成', tags: ['azure', 'ai', 'cloud'], status: 'not-started', progress: 0, uses: 0, icon: '☁️' },
+        { id: '10', name: 'cursor-ide', category: 'ai-coding', source: 'cursor.sh', url: 'https://cursor.sh', desc: 'Cursor IDE 使用技巧', tags: ['cursor', 'ide', 'ai'], status: 'learning', progress: 80, uses: 45, icon: '💻' },
+        { id: '11', name: 'docker-basics', category: 'backend', source: 'docker.com', url: 'https://docker.com', desc: 'Docker 容器基础', tags: ['docker', 'container', 'devops'], status: 'mastered', progress: 100, uses: 67, icon: '🐳' },
+        { id: '12', name: 'git-workflow', category: 'tools', source: 'git-scm.com', url: 'https://git-scm.com', desc: 'Git 工作流最佳实践', tags: ['git', 'version-control'], status: 'mastered', progress: 100, uses: 89, icon: '🌿' }
+      ];
+
+      var state = {
+        skills: [],
+        category: 'all',
+        tag: 'all',
+        query: '',
+        detailId: null,
+        editingId: null
+      };
+
+      var loadWarning = '';
+
+      /* ================= helpers ================= */
+      function $(sel, root) { return (root || document).querySelector(sel); }
+
+      function escapeHtml(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch];
+        });
+      }
+
+      function normalizeUrl(value) {
+        var raw = String(value == null ? '' : value).trim();
+        if (!raw) return '';
+        try {
+          var url = new URL(raw);
+          return (url.protocol === 'http:' || url.protocol === 'https:') ? url.href : '';
+        } catch (err) {
+          return '';
+        }
+      }
+
+      function uid() {
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
+        return 's-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+      }
+
+      function clampProgress(value, fallback) {
+        var n = Number(value);
+        if (!isFinite(n)) n = fallback;
+        return Math.max(0, Math.min(100, Math.round(n)));
+      }
+
+      function normalizeSkill(raw) {
+        if (!raw || typeof raw !== 'object') return null;
+        var status = STATUS[raw.status] ? raw.status : 'not-started';
+        var fallbackProgress = status === 'mastered' ? 100 : (status === 'learning' ? 50 : 0);
+        var tags = Array.isArray(raw.tags)
+          ? raw.tags.map(function (t) { return String(t).trim().toLowerCase(); }).filter(Boolean)
+          : [];
+        tags = tags.filter(function (t, i) { return tags.indexOf(t) === i; }).slice(0, 8);
+        var icon = Array.from(String(raw.icon || '📦')).slice(0, 4).join('') || '📦';
+        var id = raw.id == null || raw.id === '' ? uid() : String(raw.id);
+        var uses = Math.max(0, Math.floor(Number(raw.uses) || 0));
+        return {
+          id: id,
+          name: String(raw.name == null ? '' : raw.name).trim().slice(0, 80) || '未命名技能',
+          category: CATEGORY_NAMES[raw.category] ? raw.category : 'tools',
+          source: String(raw.source == null ? '' : raw.source).trim().slice(0, 40) || 'custom',
+          url: normalizeUrl(raw.url),
+          desc: String(raw.desc == null ? '' : raw.desc).trim().slice(0, 300),
+          tags: tags,
+          status: status,
+          progress: clampProgress(raw.progress, fallbackProgress),
+          uses: uses,
+          icon: icon,
+          createdAt: typeof raw.createdAt === 'string' ? raw.createdAt : new Date().toISOString()
         };
+      }
 
-        function save() {
-            localStorage.setItem('ezskills_data', JSON.stringify(skills));
-            updateStats();
+      function cloneDefaults() {
+        return DEFAULT_SKILLS.map(function (s) {
+          var copy = normalizeSkill(s);
+          copy.id = s.id;
+          return copy;
+        });
+      }
+
+      function readStoredTheme() {
+        try {
+          var value = localStorage.getItem(THEME_KEY);
+          return (value === 'light' || value === 'dark') ? value : '';
+        } catch (err) {
+          return '';
         }
+      }
 
-        function updateStats() {
-            document.getElementById('totalSkills').textContent = skills.length;
-            document.getElementById('learningSkills').textContent = skills.filter(s => s.status === 'learning').length;
-            document.getElementById('masteredSkills').textContent = skills.filter(s => s.status === 'mastered').length;
-            document.getElementById('totalUses').textContent = skills.reduce((sum, s) => sum + s.uses, 0);
-        }
-
-        function getAllTags() {
-            const tags = new Set();
-            skills.forEach(s => s.tags.forEach(t => tags.add(t)));
-            return Array.from(tags).sort();
-        }
-
-        function renderTags() {
-            const container = document.getElementById('tagsContainer');
-            const tags = getAllTags();
-            container.innerHTML = tags.map(t => `
-                <button onclick="filterTag('${t}')" class="px-3 py-1 rounded-full text-xs ${currentTag === t ? 'tag-active' : 'bg-white border text-slate-600'}">${t}</button>
-            `).join('') || '<span class="text-sm text-slate-400">暂无标签</span>';
-        }
-
-        function filterCategory(cat) {
-            currentCategory = cat;
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.classList.toggle('category-active', btn.dataset.category === cat);
-                btn.classList.toggle('bg-white', btn.dataset.category !== cat);
-            });
-            renderSkills();
-        }
-
-        function filterTag(tag) {
-            currentTag = currentTag === tag ? 'all' : tag;
-            renderTags();
-            renderSkills();
-        }
-
-        function getStatusColor(status) {
-            const colors = { 'not-started': 'bg-slate-100 text-slate-500', 'learning': 'bg-blue-100 text-blue-600', 'mastered': 'bg-green-100 text-green-600' };
-            return colors[status] || colors['not-started'];
-        }
-
-        function getStatusText(status) {
-            const texts = { 'not-started': '未开始', 'learning': '学习中', 'mastered': '已掌握' };
-            return texts[status] || '未开始';
-        }
-
-        function renderSkills() {
-            const grid = document.getElementById('skillsGrid');
-            const search = document.getElementById('searchInput').value.toLowerCase();
-            
-            let filtered = skills;
-            if (currentCategory !== 'all') filtered = filtered.filter(s => s.category === currentCategory);
-            if (currentTag !== 'all') filtered = filtered.filter(s => s.tags.includes(currentTag));
-            if (search) filtered = filtered.filter(s => s.name.toLowerCase().includes(search) || s.desc.toLowerCase().includes(search) || s.tags.some(t => t.includes(search)));
-            
-            document.getElementById('skillsCount').textContent = filtered.length + ' 个技能';
-            
-            grid.innerHTML = filtered.map(s => `
-                <div class="card-hover bg-white rounded-2xl p-5 border border-slate-200 cursor-pointer" onclick="showDetail(${s.id})">
-                    <div class="flex items-start gap-3">
-                        <div class="w-12 h-12 bg-violet-100 rounded-xl flex items-center justify-center text-2xl">${s.icon || '📦'}</div>
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-bold text-slate-800 truncate">${s.name}</h3>
-                                <span class="text-xs px-2 py-0.5 rounded-full ${getStatusColor(s.status)}">${getStatusText(s.status)}</span>
-                            </div>
-                            <p class="text-sm text-slate-500 mt-1 line-clamp-2">${s.desc}</p>
-                            <div class="flex flex-wrap gap-1 mt-2">${s.tags.map(t => `<span class="text-xs px-2 py-0.5 bg-slate-100 rounded-full">${t}</span>`).join('')}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <div class="flex justify-between text-xs text-slate-400 mb-1">
-                            <span>进度</span>
-                            <span>${s.progress}%</span>
-                        </div>
-                        <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-                            <div class="h-full bg-violet-500 progress-bar rounded-full" style="width: ${s.progress}%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-                        <span class="text-xs text-slate-400">来源: ${s.source}</span>
-                        <span class="text-xs text-slate-500">使用 ${s.uses} 次</span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function showDetail(id) {
-            const s = skills.find(x => x.id === id);
-            if (!s) return;
-            document.getElementById('detailTitle').textContent = s.name;
-            document.getElementById('detailContent').innerHTML = `
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-16 h-16 bg-violet-100 rounded-xl flex items-center justify-center text-3xl">${s.icon || '📦'}</div>
-                    <div>
-                        <div class="font-bold text-lg">${s.name}</div>
-                        <div class="text-sm text-slate-500">${categoryNames[s.category]}</div>
-                    </div>
-                </div>
-                
-                <p class="text-slate-600">${s.desc}</p>
-                
-                <div class="flex gap-2">${s.tags.map(t => `<span class="px-2 py-1 bg-slate-100 rounded-lg text-sm">${t}</span>`).join('')}</div>
-                
-                <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
-                    <div class="h-full bg-violet-500 rounded-full" style="width: ${s.progress}%"></div>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="updateStatus(${s.id}, 'not-started')" class="py-2 border rounded-xl ${s.status === 'not-started' ? 'bg-slate-100' : ''}">未开始</button>
-                    <button onclick="updateStatus(${s.id}, 'learning')" class="py-2 border rounded-xl ${s.status === 'learning' ? 'bg-blue-100 text-blue-600' : ''}">学习中</button>
-                    <button onclick="updateStatus(${s.id}, 'mastered')" class="py-2 border rounded-xl ${s.status === 'mastered' ? 'bg-green-100 text-green-600' : ''}">已掌握</button>
-                    <button onclick="incrementUse(${s.id})" class="py-2 bg-violet-600 text-white rounded-xl">+1 使用</button>
-                </div>
-                
-                ${s.url ? `<a href="${s.url}" target="_blank" class="block text-center py-2 bg-violet-50 text-violet-600 rounded-xl">查看文档 -></a>` : ''}
-            `;
-            document.getElementById('detailModal').classList.replace('hidden', 'flex');
-        }
-
-        function updateStatus(id, status) {
-            const s = skills.find(x => x.id === id);
-            if (s) {
-                s.status = status;
-                s.progress = status === 'mastered' ? 100 : status === 'learning' ? 50 : 0;
-                save();
-                renderSkills();
-                showDetail(id);
-            }
-        }
-
-        function incrementUse(id) {
-            const s = skills.find(x => x.id === id);
-            if (s) {
-                s.uses++;
-                save();
-                renderSkills();
-                showDetail(id);
-            }
-        }
-
-        function showAddModal() {
-            document.getElementById('addModal').classList.replace('hidden', 'flex');
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.replace('flex', 'hidden');
-        }
-
-        document.getElementById('addForm').onsubmit = e => {
-            e.preventDefault();
-            const f = e.target;
-            skills.unshift({
-                id: Date.now(),
-                name: f.name.value,
-                category: f.category.value,
-                source: f.source.value || 'custom',
-                url: f.url.value,
-                desc: f.desc.value,
-                tags: f.tags.value.split(' ').filter(Boolean),
-                status: 'not-started',
-                progress: 0,
-                uses: 0,
-                icon: '📦'
-            });
-            save();
-            renderTags();
-            renderSkills();
-            closeModal('addModal');
-            f.reset();
+      function persist() {
+        var payload = {
+          version: 2,
+          updatedAt: new Date().toISOString(),
+          skills: state.skills
         };
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+          return true;
+        } catch (err) {
+          showToast('保存失败：浏览器本地存储不可用');
+          return false;
+        }
+      }
 
-        document.getElementById('searchInput').oninput = renderSkills;
+      function loadSkills() {
+        var list = null;
+        var migrated = false;
+        try {
+          var raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            var parsed = JSON.parse(raw);
+            if (parsed && Array.isArray(parsed.skills)) list = parsed.skills;
+          }
+        } catch (err) {
+          loadWarning = '本地数据读取失败，已载入示例数据';
+        }
 
-        // Init
-        updateStats();
+        if (!list) {
+          try {
+            var legacy = localStorage.getItem(LEGACY_KEY);
+            if (legacy) {
+              var legacyList = JSON.parse(legacy);
+              if (Array.isArray(legacyList) && legacyList.length) {
+                list = legacyList;
+                migrated = true;
+                if (!loadWarning) loadWarning = '已把旧版数据迁移到新格式';
+              }
+            }
+          } catch (err) {
+            loadWarning = '旧版本地数据已损坏，已载入示例数据';
+          }
+        }
+
+        var skills = (list || []).map(normalizeSkill).filter(Boolean);
+        if (!skills.length) skills = cloneDefaults();
+
+        state.skills = skills;
+        if (list && migrated) {
+          var saved = persist();
+          if (saved) {
+            try { localStorage.removeItem(LEGACY_KEY); } catch (err) { /* ignore */ }
+          }
+        }
+      }
+
+      /* ================= theme ================= */
+      var themeColorMeta = $('#theme-color');
+      var themeToggle = $('#theme-toggle');
+
+      function currentTheme() {
+        return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      }
+
+      function applyTheme(theme, persistChoice) {
+        document.documentElement.setAttribute('data-theme', theme);
+        if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#12140f' : '#f7f2e8');
+        if (themeToggle) {
+          themeToggle.setAttribute('aria-label', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
+          themeToggle.setAttribute('title', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
+        }
+        if (persistChoice) {
+          try { localStorage.setItem(THEME_KEY, theme); } catch (err) { /* ignore */ }
+        }
+      }
+
+      function initTheme() {
+        var stored = readStoredTheme();
+        var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyTheme(stored || (systemDark ? 'dark' : 'light'), false);
+
+        if (themeToggle) {
+          themeToggle.addEventListener('click', function () {
+            applyTheme(currentTheme() === 'dark' ? 'light' : 'dark', true);
+          });
+        }
+
+        if (window.matchMedia) {
+          var mq = window.matchMedia('(prefers-color-scheme: dark)');
+          var onChange = function (event) {
+            if (!readStoredTheme()) applyTheme(event.matches ? 'dark' : 'light', false);
+          };
+          if (typeof mq.addEventListener === 'function') mq.addEventListener('change', onChange);
+          else if (typeof mq.addListener === 'function') mq.addListener(onChange);
+        }
+      }
+
+      /* ================= toast ================= */
+      var toast = $('#toast');
+      var toastMessage = $('#toast-message');
+      var toastAction = $('#toast-action');
+      var toastTimer = null;
+
+      function hideToast() {
+        toast.classList.remove('show');
+        toastAction.hidden = true;
+        toastAction.onclick = null;
+      }
+
+      function showToast(message, actionLabel, action) {
+        toastMessage.textContent = message;
+        if (actionLabel && typeof action === 'function') {
+          toastAction.hidden = false;
+          toastAction.textContent = actionLabel;
+          toastAction.onclick = function () {
+            hideToast();
+            action();
+          };
+        } else {
+          toastAction.hidden = true;
+          toastAction.onclick = null;
+        }
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(hideToast, actionLabel ? 7000 : 2800);
+      }
+
+      /* ================= rendering ================= */
+      var grid = $('#grid');
+      var categoryChips = $('#category-chips');
+      var tagChips = $('#tag-chips');
+      var resultCount = $('#result-count');
+      var clearFiltersBtn = $('#clear-filters');
+
+      function findSkill(id) {
+        var key = String(id);
+        for (var i = 0; i < state.skills.length; i++) {
+          if (String(state.skills[i].id) === key) return state.skills[i];
+        }
+        return null;
+      }
+
+      function skillIndex(id) {
+        var key = String(id);
+        for (var i = 0; i < state.skills.length; i++) {
+          if (String(state.skills[i].id) === key) return i;
+        }
+        return -1;
+      }
+
+      function renderStats() {
+        var mastered = 0;
+        var learning = 0;
+        var uses = 0;
+        state.skills.forEach(function (s) {
+          if (s.status === 'mastered') mastered++;
+          if (s.status === 'learning') learning++;
+          uses += s.uses;
+        });
+        $('#stat-total').textContent = String(state.skills.length);
+        $('#stat-mastered').textContent = String(mastered);
+        $('#stat-learning').textContent = String(learning);
+        $('#stat-uses').textContent = String(uses);
+      }
+
+      function renderCategories() {
+        var html = CATEGORIES.map(function (category) {
+          var count = category.id === 'all'
+            ? state.skills.length
+            : state.skills.filter(function (s) { return s.category === category.id; }).length;
+          var pressed = state.category === category.id ? 'true' : 'false';
+          return '<button class="chip" type="button" data-category="' + category.id + '" aria-pressed="' + pressed + '">' +
+            escapeHtml(category.name) + '<span class="chip-count">' + count + '</span></button>';
+        }).join('');
+        categoryChips.innerHTML = html;
+      }
+
+      function renderTags() {
+        var counts = {};
+        state.skills.forEach(function (s) {
+          s.tags.forEach(function (tag) { counts[tag] = (counts[tag] || 0) + 1; });
+        });
+        var tags = Object.keys(counts).sort(function (a, b) {
+          return counts[b] - counts[a] || a.localeCompare(b);
+        });
+        if (state.tag !== 'all' && tags.indexOf(state.tag) === -1) state.tag = 'all';
+        tagChips.innerHTML = tags.map(function (tag) {
+          var pressed = state.tag === tag ? 'true' : 'false';
+          return '<button class="tag" type="button" data-tag="' + escapeHtml(tag) + '" aria-pressed="' + pressed + '">' +
+            escapeHtml(tag) + '</button>';
+        }).join('') || '<span class="result-count">暂无标签</span>';
+      }
+
+      function syncCategoryPressed() {
+        var chips = categoryChips.querySelectorAll('[data-category]');
+        for (var i = 0; i < chips.length; i++) {
+          chips[i].setAttribute('aria-pressed', chips[i].getAttribute('data-category') === state.category ? 'true' : 'false');
+        }
+      }
+
+      function syncTagPressed() {
+        var tags = tagChips.querySelectorAll('[data-tag]');
+        for (var i = 0; i < tags.length; i++) {
+          tags[i].setAttribute('aria-pressed', tags[i].getAttribute('data-tag') === state.tag ? 'true' : 'false');
+        }
+      }
+
+      function visibleSkills() {
+        var query = state.query.trim().toLowerCase();
+        return state.skills.filter(function (s) {
+          if (state.category !== 'all' && s.category !== state.category) return false;
+          if (state.tag !== 'all' && s.tags.indexOf(state.tag) === -1) return false;
+          if (!query) return true;
+          var haystack = [s.name, s.desc, s.source, s.tags.join(' ')].join(' ').toLowerCase();
+          return haystack.indexOf(query) !== -1;
+        });
+      }
+
+      function cardHtml(s) {
+        var status = STATUS[s.status] || STATUS['not-started'];
+        var tags = s.tags.slice(0, 3).map(function (tag) {
+          return '<li class="tag-chip">' + escapeHtml(tag) + '</li>';
+        });
+        if (s.tags.length > 3) {
+          tags.push('<li class="tag-chip more">+' + (s.tags.length - 3) + '</li>');
+        }
+        if (!tags.length) tags.push('<li class="tag-chip">无标签</li>');
+
+        return '<article class="card" data-id="' + escapeHtml(s.id) + '" data-status="' + s.status + '" tabindex="0" role="button" aria-label="查看 ' + escapeHtml(s.name) + ' 详情">' +
+          '<div class="card-top">' +
+            '<span class="card-icon" aria-hidden="true">' + escapeHtml(s.icon) + '</span>' +
+            '<div class="card-heading">' +
+              '<div class="card-title-row">' +
+                '<h3 class="card-name" title="' + escapeHtml(s.name) + '">' + escapeHtml(s.name) + '</h3>' +
+                '<span class="status ' + status.className + '">' + status.label + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          '<p class="card-desc">' + (s.desc ? escapeHtml(s.desc) : '暂无描述') + '</p>' +
+          '<ul class="card-tags">' + tags.join('') + '</ul>' +
+          '<div class="progress-block">' +
+            '<div class="progress-row"><span>进度</span><span>' + s.progress + '%</span></div>' +
+            '<div class="progress-track" role="progressbar" aria-label="' + escapeHtml(s.name) + ' 学习进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + s.progress + '">' +
+              '<div class="progress-fill" style="--p:' + s.progress + '%"></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="card-meta">' +
+            '<span class="card-source" title="' + escapeHtml(s.source) + '">' + escapeHtml(s.source) + '</span>' +
+            '<span class="card-uses">使用 ' + s.uses + ' 次</span>' +
+          '</div>' +
+        '</article>';
+      }
+
+      function renderGrid() {
+        var list = visibleSkills();
+        var filtered = state.category !== 'all' || state.tag !== 'all' || state.query.trim() !== '';
+
+        if (!state.skills.length) {
+          grid.innerHTML = '<div class="empty">' +
+            '<strong>还没有技能</strong>' +
+            '<p>点击右上角「添加技能」，或者从备份文件导入。</p>' +
+            '</div>';
+        } else if (!list.length) {
+          grid.innerHTML = '<div class="empty">' +
+            '<strong>没有匹配的技能</strong>' +
+            '<p>换个关键词，或者清除当前的分类 / 标签筛选。</p>' +
+            '</div>';
+        } else {
+          grid.innerHTML = list.map(cardHtml).join('');
+        }
+
+        resultCount.textContent = filtered
+          ? '显示 ' + list.length + ' / ' + state.skills.length + ' 个'
+          : list.length + ' 个';
+        clearFiltersBtn.hidden = !filtered;
+      }
+
+      function renderAll() {
+        renderStats();
+        renderCategories();
         renderTags();
-        renderSkills();
-    </script>
+        renderGrid();
+      }
+
+      function resetFilters() {
+        state.category = 'all';
+        state.tag = 'all';
+        state.query = '';
+        $('#search').value = '';
+      }
+
+      /* ================= detail ================= */
+      var detailDialog = $('#detail-dialog');
+      var detailTitle = $('#detail-title');
+      var detailBody = $('#detail-body');
+
+      function detailHtml(s) {
+        var status = STATUS[s.status] || STATUS['not-started'];
+        var tags = s.tags.length
+          ? s.tags.map(function (tag) { return '<li class="tag-chip">' + escapeHtml(tag) + '</li>'; }).join('')
+          : '<li class="tag-chip">无标签</li>';
+        var statusButtons = Object.keys(STATUS).map(function (key) {
+          var pressed = s.status === key ? 'true' : 'false';
+          return '<button class="status-btn" type="button" data-action="status" data-status="' + key + '" aria-pressed="' + pressed + '">' +
+            STATUS[key].label + '</button>';
+        }).join('');
+        var link = s.url
+          ? '<a class="btn detail-link" href="' + escapeHtml(s.url) + '" target="_blank" rel="noopener noreferrer">' +
+              '<span>打开文档</span><span>' + escapeHtml(s.source) + ' ↗</span></a>'
+          : '';
+
+        return '<div class="detail-hero">' +
+            '<span class="detail-icon" aria-hidden="true">' + escapeHtml(s.icon) + '</span>' +
+            '<div class="detail-meta">' +
+              '<span>' + escapeHtml(CATEGORY_NAMES[s.category] || s.category) + '</span>' +
+              '<span>来源 ' + escapeHtml(s.source) + '</span>' +
+              '<span>使用 ' + s.uses + ' 次</span>' +
+            '</div>' +
+          '</div>' +
+          '<p class="detail-desc">' + (s.desc ? escapeHtml(s.desc) : '暂无描述') + '</p>' +
+          '<ul class="detail-tags">' + tags + '</ul>' +
+          '<div class="detail-progress">' +
+            '<div class="progress-row"><span>进度</span><span>' + s.progress + '%</span></div>' +
+            '<div class="progress-track" role="progressbar" aria-label="学习进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + s.progress + '">' +
+              '<div class="progress-fill" style="--p:' + s.progress + '%;--status-color:' + statusColor(s.status) + '"></div>' +
+            '</div>' +
+          '</div>' +
+          '<div class="status-group" role="group" aria-label="学习状态">' + statusButtons + '</div>' +
+          '<div class="detail-actions">' +
+            '<button class="btn btn-primary" type="button" data-action="use">+1 使用</button>' +
+            '<button class="btn" type="button" data-action="edit">编辑</button>' +
+            '<button class="btn btn-danger" type="button" data-action="delete">删除</button>' +
+          '</div>' + link;
+      }
+
+      function statusColor(status) {
+        if (status === 'mastered') return 'var(--emerald)';
+        if (status === 'learning') return 'var(--amber)';
+        return 'var(--muted)';
+      }
+
+      function openDetail(id) {
+        var skill = findSkill(id);
+        if (!skill) return;
+        state.detailId = String(skill.id);
+        detailTitle.textContent = skill.name;
+        detailBody.innerHTML = detailHtml(skill);
+        if (typeof detailDialog.showModal === 'function' && !detailDialog.open) {
+          detailDialog.showModal();
+        }
+      }
+
+      function closeDetail() {
+        if (detailDialog.open) detailDialog.close();
+      }
+
+      function refreshDetail(focusSelector) {
+        var skill = findSkill(state.detailId);
+        if (!skill) { closeDetail(); return; }
+        detailTitle.textContent = skill.name;
+        detailBody.innerHTML = detailHtml(skill);
+        if (focusSelector) {
+          var target = detailBody.querySelector(focusSelector);
+          if (target) target.focus();
+        }
+      }
+
+      function setStatus(skill, status) {
+        if (!STATUS[status] || skill.status === status) return false;
+        skill.status = status;
+        if (status === 'mastered') skill.progress = 100;
+        else if (status === 'not-started') skill.progress = 0;
+        else if (!(skill.progress > 0 && skill.progress < 100)) skill.progress = 50;
+        return true;
+      }
+
+      /* ================= form ================= */
+      var editDialog = $('#edit-dialog');
+      var editForm = $('#edit-form');
+      var editTitle = $('#edit-title');
+      var editSubmit = $('#edit-submit');
+      var formError = $('#form-error');
+      var nameInput = $('#field-name');
+      var urlInput = $('#field-url');
+
+      function clearFormError() {
+        formError.hidden = true;
+        formError.textContent = '';
+        nameInput.removeAttribute('aria-invalid');
+        urlInput.removeAttribute('aria-invalid');
+      }
+
+      function openForm(skill) {
+        clearFormError();
+        state.editingId = skill ? String(skill.id) : null;
+        editTitle.textContent = skill ? '编辑技能' : '添加技能';
+        editSubmit.textContent = skill ? '保存修改' : '添加';
+        editForm.reset();
+
+        if (skill) {
+          $('#field-name').value = skill.name;
+          $('#field-category').value = skill.category;
+          $('#field-status').value = skill.status;
+          $('#field-source').value = skill.source === 'custom' ? '' : skill.source;
+          $('#field-icon').value = skill.icon;
+          $('#field-url').value = skill.url;
+          $('#field-desc').value = skill.desc;
+          $('#field-tags').value = skill.tags.join(' ');
+        } else {
+          $('#field-status').value = 'not-started';
+        }
+
+        closeDetail();
+        editDialog.showModal();
+        window.setTimeout(function () {
+          nameInput.focus();
+          if (skill) nameInput.select();
+        }, 0);
+      }
+
+      function parseTags(value) {
+        var seen = {};
+        return String(value || '')
+          .split(/[\s,，、]+/)
+          .map(function (tag) { return tag.trim().toLowerCase(); })
+          .filter(function (tag) {
+            if (!tag || seen[tag]) return false;
+            seen[tag] = true;
+            return true;
+          })
+          .slice(0, 8);
+      }
+
+      /* ================= confirm ================= */
+      var confirmDialog = $('#confirm-dialog');
+      var confirmTitle = $('#confirm-title');
+      var confirmMessage = $('#confirm-message');
+      var confirmOk = $('#confirm-ok');
+      var confirmResolver = null;
+
+      function confirmAction(title, message, okLabel) {
+        confirmTitle.textContent = title;
+        confirmMessage.textContent = message;
+        confirmOk.textContent = okLabel || '确认';
+        confirmDialog.returnValue = '';
+        return new Promise(function (resolve) {
+          confirmResolver = resolve;
+          confirmDialog.showModal();
+        });
+      }
+
+      function settleConfirm(ok) {
+        var resolver = confirmResolver;
+        confirmResolver = null;
+        if (confirmDialog.open) confirmDialog.close();
+        if (resolver) resolver(ok);
+      }
+
+      /* ================= data actions ================= */
+      function exportData() {
+        var payload = {
+          version: 2,
+          exportedAt: new Date().toISOString(),
+          skills: state.skills
+        };
+        var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = 'ezskills-' + new Date().toISOString().slice(0, 10) + '.json';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        showToast('已导出 ' + state.skills.length + ' 个技能');
+      }
+
+      function importData(file) {
+        var reader = new FileReader();
+        reader.onload = function () {
+          var parsed;
+          try {
+            parsed = JSON.parse(String(reader.result));
+          } catch (err) {
+            showToast('导入失败：不是有效的 JSON 文件');
+            return;
+          }
+          var rawList = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.skills) ? parsed.skills : null);
+          if (!rawList) {
+            showToast('导入失败：缺少 skills 数组');
+            return;
+          }
+          var next = rawList.map(normalizeSkill).filter(Boolean);
+          if (!next.length) {
+            showToast('导入失败：没有可用的技能');
+            return;
+          }
+          confirmAction('导入备份', '将用 ' + next.length + ' 个技能覆盖当前的 ' + state.skills.length + ' 个。建议先导出当前数据。', '覆盖导入')
+            .then(function (ok) {
+              if (!ok) return;
+              state.skills = next;
+              resetFilters();
+              persist();
+              renderAll();
+              showToast('已导入 ' + next.length + ' 个技能');
+            });
+        };
+        reader.onerror = function () { showToast('导入失败：文件读取错误'); };
+        reader.readAsText(file);
+      }
+
+      function resetData() {
+        confirmAction('恢复示例数据', '当前技能库将被 12 条示例数据替换，已添加和修改的内容会丢失。建议先导出备份。', '恢复示例')
+          .then(function (ok) {
+            if (!ok) return;
+            state.skills = cloneDefaults();
+            resetFilters();
+            persist();
+            renderAll();
+            showToast('已恢复示例数据');
+          });
+      }
+
+      /* ================= events ================= */
+      function bindEvents() {
+        categoryChips.addEventListener('click', function (event) {
+          var button = event.target.closest('[data-category]');
+          if (!button) return;
+          state.category = button.getAttribute('data-category');
+          syncCategoryPressed();
+          renderGrid();
+        });
+
+        tagChips.addEventListener('click', function (event) {
+          var button = event.target.closest('[data-tag]');
+          if (!button) return;
+          var tag = button.getAttribute('data-tag');
+          state.tag = state.tag === tag ? 'all' : tag;
+          syncTagPressed();
+          renderGrid();
+        });
+
+        clearFiltersBtn.addEventListener('click', function () {
+          resetFilters();
+          syncCategoryPressed();
+          syncTagPressed();
+          renderGrid();
+        });
+
+        var searchInput = $('#search');
+        searchInput.addEventListener('input', function () {
+          state.query = searchInput.value;
+          renderGrid();
+        });
+
+        searchInput.addEventListener('keydown', function (event) {
+          if (event.key === 'Escape' && searchInput.value) {
+            searchInput.value = '';
+            state.query = '';
+            renderGrid();
+          }
+        });
+
+        grid.addEventListener('click', function (event) {
+          var card = event.target.closest('.card');
+          if (card) openDetail(card.getAttribute('data-id'));
+        });
+
+        grid.addEventListener('keydown', function (event) {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          var card = event.target.closest('.card');
+          if (!card) return;
+          event.preventDefault();
+          openDetail(card.getAttribute('data-id'));
+        });
+
+        $('#add-btn').addEventListener('click', function () { openForm(null); });
+
+        detailBody.addEventListener('click', function (event) {
+          var button = event.target.closest('[data-action]');
+          if (!button) return;
+          var skill = findSkill(state.detailId);
+          if (!skill) return;
+          var action = button.getAttribute('data-action');
+
+          if (action === 'status') {
+            if (setStatus(skill, button.getAttribute('data-status'))) {
+              persist();
+              renderStats();
+              renderGrid();
+              refreshDetail('[data-action="status"][data-status="' + skill.status + '"]');
+            }
+          } else if (action === 'use') {
+            skill.uses += 1;
+            persist();
+            renderStats();
+            renderGrid();
+            refreshDetail('[data-action="use"]');
+          } else if (action === 'edit') {
+            openForm(skill);
+          } else if (action === 'delete') {
+            var index = skillIndex(skill.id);
+            var removed = skill;
+            if (index === -1) return;
+            state.skills.splice(index, 1);
+            persist();
+            closeDetail();
+            renderAll();
+            showToast('已删除「' + removed.name + '」', '撤销', function () {
+              state.skills.splice(Math.min(index, state.skills.length), 0, removed);
+              persist();
+              renderAll();
+              showToast('已恢复「' + removed.name + '」');
+            });
+          }
+        });
+
+        editForm.addEventListener('submit', function (event) {
+          event.preventDefault();
+          clearFormError();
+
+          var name = nameInput.value.trim();
+          if (!name) {
+            formError.textContent = '请填写技能名称。';
+            formError.hidden = false;
+            nameInput.setAttribute('aria-invalid', 'true');
+            nameInput.focus();
+            return;
+          }
+
+          var rawUrl = urlInput.value.trim();
+          var url = rawUrl ? normalizeUrl(rawUrl) : '';
+          if (rawUrl && !url) {
+            formError.textContent = '文档链接需要是 http:// 或 https:// 开头的地址。';
+            formError.hidden = false;
+            urlInput.setAttribute('aria-invalid', 'true');
+            urlInput.focus();
+            return;
+          }
+
+          var category = $('#field-category').value;
+          var status = $('#field-status').value;
+          var icon = Array.from($('#field-icon').value.trim() || '📦').slice(0, 4).join('') || '📦';
+          var source = $('#field-source').value.trim() || 'custom';
+          var desc = $('#field-desc').value.trim();
+          var tags = parseTags($('#field-tags').value);
+          var existing = state.editingId ? findSkill(state.editingId) : null;
+
+          if (existing) {
+            var previousStatus = existing.status;
+            existing.name = name;
+            existing.category = category;
+            existing.status = STATUS[status] ? status : 'not-started';
+            existing.source = source;
+            existing.url = url;
+            existing.desc = desc;
+            existing.tags = tags;
+            existing.icon = icon;
+            if (existing.status !== previousStatus) {
+              if (existing.status === 'mastered') existing.progress = 100;
+              else if (existing.status === 'not-started') existing.progress = 0;
+              else if (!(existing.progress > 0 && existing.progress < 100)) existing.progress = 50;
+            }
+          } else {
+            var created = normalizeSkill({
+              id: uid(),
+              name: name,
+              category: category,
+              status: status,
+              source: source,
+              url: url,
+              desc: desc,
+              tags: tags,
+              icon: icon,
+              progress: status === 'mastered' ? 100 : (status === 'learning' ? 50 : 0),
+              uses: 0,
+              createdAt: new Date().toISOString()
+            });
+            state.skills.unshift(created);
+            state.editingId = created.id;
+          }
+
+          var savedId = state.editingId;
+          persist();
+          resetFilters();
+          renderAll();
+          editDialog.close();
+          showToast(existing ? '已保存修改' : '已添加「' + name + '」');
+          state.editingId = null;
+
+          if (existing) {
+            openDetail(savedId);
+          } else {
+            var card = null;
+            var cards = grid.querySelectorAll('.card');
+            for (var i = 0; i < cards.length; i++) {
+              if (cards[i].getAttribute('data-id') === String(savedId)) { card = cards[i]; break; }
+            }
+            if (card) {
+              card.classList.add('is-new');
+              card.scrollIntoView({ block: 'center', behavior: 'smooth' });
+              card.focus({ preventScroll: true });
+            }
+          }
+        });
+
+        editForm.addEventListener('input', function (event) {
+          if (event.target === nameInput) nameInput.removeAttribute('aria-invalid');
+          if (event.target === urlInput) urlInput.removeAttribute('aria-invalid');
+        });
+
+        document.querySelectorAll('[data-close]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            var dialog = button.closest('dialog');
+            if (dialog) dialog.close();
+          });
+        });
+
+        detailDialog.addEventListener('click', function (event) {
+          if (event.target === detailDialog) detailDialog.close();
+        });
+        editDialog.addEventListener('click', function (event) {
+          if (event.target === editDialog) editDialog.close();
+        });
+        confirmDialog.addEventListener('click', function (event) {
+          if (event.target === confirmDialog) settleConfirm(false);
+        });
+
+        confirmDialog.addEventListener('cancel', function (event) {
+          event.preventDefault();
+          settleConfirm(false);
+        });
+
+        confirmDialog.querySelectorAll('[data-confirm]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            settleConfirm(button.getAttribute('data-confirm') === 'ok');
+          });
+        });
+
+        document.querySelectorAll('[data-data-action]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            var action = button.getAttribute('data-data-action');
+            if (action === 'export') exportData();
+            else if (action === 'reset') resetData();
+            else if (action === 'import') $('#import-file').click();
+          });
+        });
+
+        $('#import-file').addEventListener('change', function (event) {
+          var file = event.target.files && event.target.files[0];
+          if (file) importData(file);
+          event.target.value = '';
+        });
+
+        document.addEventListener('keydown', function (event) {
+          if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) return;
+          var target = event.target;
+          var tagName = target && target.tagName ? target.tagName : '';
+          if (tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT' || (target && target.isContentEditable)) return;
+          event.preventDefault();
+          searchInput.focus();
+        });
+      }
+
+      /* ================= init ================= */
+      function init() {
+        initTheme();
+        loadSkills();
+        bindEvents();
+        renderAll();
+        if (loadWarning) showToast(loadWarning);
+      }
+
+      init();
+    })();
+  </script>
 </body>
 </html>
