@@ -6,23 +6,23 @@
   <title>EzSkills · 个人技能库</title>
   <meta name="description" content="EzSkills 是 Kiang 的个人技能库：把 AI 编程、前端、后端、工具、内容、设计六大类技能收在同一张表里，记录学习状态、使用次数与进度。">
   <meta name="author" content="Kiang">
-  <meta name="theme-color" content="#f7f2e8" id="theme-color">
+  <meta name="theme-color" content="#ffffff" id="theme-color">
   <link rel="canonical" href="https://ezskills.kiang.website/">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%23151713'/><text x='32' y='43' text-anchor='middle' font-size='32' font-family='Georgia,serif' font-weight='700' fill='%23f7f2e8'>S</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='12' fill='%23151713'/><text x='32' y='43' text-anchor='middle' font-size='32' font-family='Georgia,serif' font-weight='700' fill='%23ffffff'>S</text></svg>">
 
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="EzSkills">
   <meta property="og:title" content="EzSkills · 个人技能库">
   <meta property="og:description" content="把会用的技能整理成一张地图：六大分类、学习状态、使用次数与进度，数据存在浏览器本地。">
   <meta property="og:url" content="https://ezskills.kiang.website/">
-  <meta property="og:image" content="https://kiang.website/og/ezskills.jpg?v=20261019">
+  <meta property="og:image" content="https://kiang.website/og/ezskills.jpg?v=20261019b">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="EzSkills 个人技能库">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="EzSkills · 个人技能库">
   <meta name="twitter:description" content="把会用的技能整理成一张地图：六大分类、学习状态、使用次数与进度。">
-  <meta name="twitter:image" content="https://kiang.website/og/ezskills.jpg?v=20261019">
+  <meta name="twitter:image" content="https://kiang.website/og/ezskills.jpg?v=20261019b">
 
   <script>
     (function () {
@@ -52,13 +52,13 @@
 
   <style>
     :root {
-      --paper: #f7f2e8;
-      --paper-soft: #fffdf8;
-      --surface: rgba(255, 253, 248, 0.86);
-      --header-bg: rgba(247, 242, 232, 0.86);
+      --paper: #ffffff;
+      --paper-soft: #ffffff;
+      --surface: #ffffff;
+      --header-bg: rgba(255, 255, 255, 0.86);
       --ink: #151713;
-      --muted: #5f665c;
-      --line: rgba(21, 23, 19, 0.13);
+      --muted: #62685f;
+      --line: rgba(21, 23, 19, 0.14);
       --line-strong: rgba(21, 23, 19, 0.24);
       --wash: rgba(21, 23, 19, 0.045);
       --emerald: #047a55;
@@ -67,8 +67,6 @@
       --amber-soft: rgba(169, 95, 20, 0.1);
       --clay: #8f4d35;
       --clay-soft: rgba(143, 77, 53, 0.1);
-      --grid-line: rgba(21, 23, 19, 0.035);
-      --grid-emerald: rgba(4, 122, 85, 0.1);
       --shadow-soft: 0 1px 2px rgba(43, 36, 24, 0.05), 0 8px 24px rgba(43, 36, 24, 0.06);
       --shadow-lift: 0 2px 6px rgba(43, 36, 24, 0.06), 0 18px 40px rgba(43, 36, 24, 0.12);
       --btn-primary-bg: #151713;
@@ -86,8 +84,8 @@
 
     [data-theme="dark"] {
       --paper: #12140f;
-      --paper-soft: #1a1d16;
-      --surface: rgba(26, 29, 22, 0.9);
+      --paper-soft: #12140f;
+      --surface: #12140f;
       --header-bg: rgba(18, 20, 15, 0.86);
       --ink: #e8eae2;
       --muted: #9ba093;
@@ -100,8 +98,6 @@
       --amber-soft: rgba(224, 149, 74, 0.14);
       --clay: #c98a6b;
       --clay-soft: rgba(201, 138, 107, 0.14);
-      --grid-line: rgba(232, 234, 226, 0.045);
-      --grid-emerald: rgba(63, 187, 133, 0.12);
       --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.34);
       --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.34), 0 12px 32px rgba(0, 0, 0, 0.42);
       --btn-primary-bg: #e8eae2;
@@ -123,12 +119,7 @@
       display: flex;
       flex-direction: column;
       color: var(--ink);
-      background-color: var(--paper);
-      background-image:
-        linear-gradient(var(--grid-line) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
-        radial-gradient(circle at 18% 0%, var(--grid-emerald), transparent 34%);
-      background-size: 42px 42px, 42px 42px, auto, auto;
+      background: var(--paper);
       font-family: var(--font-body);
       font-size: 14px;
       line-height: 1.5;
@@ -1566,7 +1557,7 @@
 
       function applyTheme(theme, persistChoice) {
         document.documentElement.setAttribute('data-theme', theme);
-        if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#12140f' : '#f7f2e8');
+        if (themeColorMeta) themeColorMeta.setAttribute('content', theme === 'dark' ? '#12140f' : '#ffffff');
         if (themeToggle) {
           themeToggle.setAttribute('aria-label', theme === 'dark' ? '切换浅色模式' : '切换深色模式');
           themeToggle.setAttribute('title', theme === 'dark' ? '切换浅色模式' : '切换深色模式');

@@ -63,7 +63,7 @@ localStorage 键：`ezskills.data.v2`
 
 ## 设计系统
 
-沿用 Kiang 视觉系统：暖纸底 `#f7f2e8` + 墨色 `#151713` + 翡翠绿 `#047a55`，Georgia 标题 / Avenir 正文 / SF Mono 数据。深色模式切到 `#12140f`。所有样式内联在 `index.html`，不加载 Tailwind CDN 或外部字体。
+沿用 Kiang 视觉系统：白纸底 `#ffffff` + 墨色 `#151713` + 翡翠绿 `#047a55`，Georgia 标题 / Avenir 正文 / SF Mono 数据。深色模式切到 `#12140f`，与主站 / EzGit / EzNav 保持同一底色。所有样式内联在 `index.html`，不加载 Tailwind CDN 或外部字体。
 
 ## 部署
 
