@@ -27,7 +27,7 @@
   <script>
     (function () {
       try {
-        var stored = localStorage.getItem('ezskills.theme');
+        var stored = localStorage.getItem('kiang-theme') || localStorage.getItem('ezskills.theme');
         var theme = (stored === 'light' || stored === 'dark')
           ? stored
           : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -75,7 +75,7 @@
       --radius: 10px;
       --radius-sm: 8px;
       --pill: 999px;
-      --container: 1160px;
+      --container: 984px;
       --font-display: Georgia, "Times New Roman", "Songti SC", "Noto Serif SC", serif;
       --font-body: "Avenir Next", "Helvetica Neue", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
       --font-mono: "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
@@ -186,7 +186,8 @@
     .header-inner {
       max-width: var(--container);
       margin: 0 auto;
-      padding: 12px 24px;
+      padding: 0 32px;
+      min-height: 64px;
       display: grid;
       grid-template-columns: auto minmax(0, 1fr) auto;
       align-items: center;
@@ -367,7 +368,7 @@
       width: 100%;
       max-width: var(--container);
       margin: 0 auto;
-      padding: 38px 24px 0;
+      padding: 38px 32px 0;
     }
 
     .page-head { padding-bottom: 26px; }
@@ -565,7 +566,7 @@
     /* ---------- grid & cards ---------- */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 14px;
     }
 
@@ -763,7 +764,7 @@
     .footer-inner {
       max-width: var(--container);
       margin: 0 auto;
-      padding: 24px 24px 40px;
+      padding: 28px 32px;
       display: grid;
       grid-template-columns: minmax(0, 1fr) auto;
       align-items: center;
@@ -1353,7 +1354,7 @@
   </div>
 
   <noscript>
-    <p style="max-width:1160px;margin:24px auto;padding:0 24px;color:#5f665c;">EzSkills 需要 JavaScript 才能渲染技能卡片。</p>
+    <p style="max-width:984px;margin:24px auto;padding:0 32px;color:#5f665c;">EzSkills 需要 JavaScript 才能渲染技能卡片。</p>
   </noscript>
 
   <script>
@@ -1363,7 +1364,7 @@
       /* ================= data ================= */
       var STORAGE_KEY = 'ezskills.data.v2';
       var LEGACY_KEY = 'ezskills_data';
-      var THEME_KEY = 'ezskills.theme';
+      var THEME_KEY = 'kiang-theme';
 
       var CATEGORIES = [
         { id: 'all', name: '全部' },
@@ -1484,7 +1485,7 @@
 
       function readStoredTheme() {
         try {
-          var value = localStorage.getItem(THEME_KEY);
+          var value = localStorage.getItem(THEME_KEY) || localStorage.getItem('ezskills.theme');
           return (value === 'light' || value === 'dark') ? value : '';
         } catch (err) {
           return '';
